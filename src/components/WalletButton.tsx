@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from "react"
-// import { networkParams } from "./networks"
+import { useEffect, useState } from "react"
 import { toHex, truncateAddress } from "../../utils"
 import { ethers } from "ethers"
-import Web3Modal from "web3modal"
-import { providerOptions } from "../../providerOptions"
+
+import WalletButtonModal from "./WalletButtonModal"
 
 import {
     Box,
@@ -13,11 +12,13 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    useColorModeValue,
+    useDisclosure,
 } from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWallet } from "@fortawesome/free-solid-svg-icons"
+
+import { useAccount, useConnect } from "wagmi"
 
 export default function WalletButton() {
     const [provider, setProvider] = useState<any>()
@@ -31,19 +32,14 @@ export default function WalletButton() {
     const [signedMessage, setSignedMessage] = useState<any>("")
     const [verified, setVerified] = useState<any>()
 
-    let web3Modal: Web3Modal
-    if (typeof window !== "undefined") {
-        web3Modal = new Web3Modal({
-            cacheProvider: true, // optional - Maintains connection between page refreshes
-            providerOptions, // required - MetaMask is the default and if you don't have any other options then the modal won't even appear and it just assumes MetaMask
-            theme: useColorModeValue("light", "dark"),
-        })
-    }
+    // const { data: account } = useAccount()
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Connect to wallet
     const connectWallet = async () => {
         try {
-            const provider = await web3Modal.connect()
+            // const provider = await web3Modal.connect()
+            onOpen()
             const library = new ethers.providers.Web3Provider(provider)
             const accounts = await library.listAccounts()
             const network = await library.getNetwork()
@@ -123,14 +119,14 @@ export default function WalletButton() {
     }
 
     const disconnect = async () => {
-        await web3Modal.clearCachedProvider()
+        // await web3Modal.clearCachedProvider()
         refreshState()
     }
 
     useEffect(() => {
-        if (web3Modal.cachedProvider) {
-            connectWallet()
-        }
+        // if (web3Modal.cachedProvider) {
+        connectWallet()
+        // }
     }, [])
 
     useEffect(() => {
@@ -199,6 +195,7 @@ export default function WalletButton() {
                     </IconButton>
                 </Box>
             )}
+            <WalletButtonModal isOpen={isOpen} closeModal={onClose} />
         </Box>
     )
 }
