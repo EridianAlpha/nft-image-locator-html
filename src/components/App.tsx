@@ -1,11 +1,8 @@
-import { useState } from "react"
 import styles from "./App.module.css"
-import { Flex, Heading, useColorMode, useColorModeValue, Button } from "@chakra-ui/react"
+import { Flex, Heading, useColorModeValue } from "@chakra-ui/react"
 import Header from "./Header"
 
 const App = () => {
-    const { toggleColorMode } = useColorMode()
-
     const formBackground = useColorModeValue("gray.100", "gray.700")
 
     return (
