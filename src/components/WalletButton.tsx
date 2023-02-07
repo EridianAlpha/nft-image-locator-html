@@ -5,32 +5,42 @@ import { ethers } from "ethers"
 import Web3Modal from "web3modal"
 import { providerOptions } from "../../providerOptions"
 
-import { Box, IconButton, Text, MenuButton, MenuList, MenuItem, Menu } from "@chakra-ui/react"
+import {
+    Box,
+    IconButton,
+    Text,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Menu,
+    useColorModeValue,
+} from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWallet } from "@fortawesome/free-solid-svg-icons"
 
-let web3Modal: any
-if (typeof window !== "undefined") {
-    web3Modal = new Web3Modal({
-        cacheProvider: true, // optional
-        providerOptions, // required
-        theme: "dark",
-    })
-}
-
 export default function WalletButton() {
-    const [provider, setProvider] = useState()
-    const [library, setLibrary] = useState()
-    const [account, setAccount] = useState()
-    const [signature, setSignature] = useState("")
-    const [error, setError] = useState("")
-    const [chainId, setChainId] = useState()
-    const [network, setNetwork] = useState()
-    const [message, setMessage] = useState("")
-    const [signedMessage, setSignedMessage] = useState("")
-    const [verified, setVerified] = useState()
+    const [provider, setProvider] = useState<any>()
+    const [library, setLibrary] = useState<any>()
+    const [account, setAccount] = useState<string>()
+    const [signature, setSignature] = useState<any>("")
+    const [error, setError] = useState<any>("")
+    const [chainId, setChainId] = useState<any>()
+    const [network, setNetwork] = useState<any>()
+    const [message, setMessage] = useState<any>("")
+    const [signedMessage, setSignedMessage] = useState<any>("")
+    const [verified, setVerified] = useState<any>()
 
+    let web3Modal: Web3Modal
+    if (typeof window !== "undefined") {
+        web3Modal = new Web3Modal({
+            cacheProvider: true, // optional - Maintains connection between page refreshes
+            providerOptions, // required - MetaMask is the default and if you don't have any other options then the modal won't even appear and it just assumes MetaMask
+            theme: useColorModeValue("light", "dark"),
+        })
+    }
+
+    // Connect to wallet
     const connectWallet = async () => {
         try {
             const provider = await web3Modal.connect()
@@ -46,12 +56,12 @@ export default function WalletButton() {
         }
     }
 
-    const handleNetwork = (e) => {
+    const handleNetwork = (e: any) => {
         const id = e.target.value
         setNetwork(Number(id))
     }
 
-    const handleInput = (e) => {
+    const handleInput = (e: any) => {
         const msg = e.target.value
         setMessage(msg)
     }
@@ -104,8 +114,8 @@ export default function WalletButton() {
     // }
 
     const refreshState = () => {
-        setAccount()
-        setChainId()
+        setAccount("")
+        setChainId("")
         setNetwork("")
         setMessage("")
         setSignature("")
@@ -123,35 +133,35 @@ export default function WalletButton() {
         }
     }, [])
 
-    // useEffect(() => {
-    //     if (provider?.on) {
-    //         const handleAccountsChanged = (accounts) => {
-    //             console.log("accountsChanged", accounts)
-    //             if (accounts) setAccount(accounts[0])
-    //         }
+    useEffect(() => {
+        if (provider?.on) {
+            const handleAccountsChanged = (accounts: string) => {
+                console.log("accountsChanged", accounts)
+                if (accounts) setAccount(accounts[0])
+            }
 
-    //         const handleChainChanged = (_hexChainId) => {
-    //             setChainId(_hexChainId)
-    //         }
+            const handleChainChanged = (_hexChainId: string) => {
+                setChainId(_hexChainId)
+            }
 
-    //         const handleDisconnect = () => {
-    //             console.log("disconnect", error)
-    //             disconnect()
-    //         }
+            const handleDisconnect = () => {
+                console.log("disconnect", error)
+                disconnect()
+            }
 
-    //         provider.on("accountsChanged", handleAccountsChanged)
-    //         provider.on("chainChanged", handleChainChanged)
-    //         provider.on("disconnect", handleDisconnect)
+            provider.on("accountsChanged", handleAccountsChanged)
+            provider.on("chainChanged", handleChainChanged)
+            provider.on("disconnect", handleDisconnect)
 
-    //         return () => {
-    //             if (provider.removeListener) {
-    //                 provider.removeListener("accountsChanged", handleAccountsChanged)
-    //                 provider.removeListener("chainChanged", handleChainChanged)
-    //                 provider.removeListener("disconnect", handleDisconnect)
-    //             }
-    //         }
-    //     }
-    // }, [provider])
+            return () => {
+                if (provider.removeListener) {
+                    provider.removeListener("accountsChanged", handleAccountsChanged)
+                    provider.removeListener("chainChanged", handleChainChanged)
+                    provider.removeListener("disconnect", handleDisconnect)
+                }
+            }
+        }
+    }, [provider])
 
     return (
         <Box>

@@ -1,5 +1,6 @@
 import WalletConnect from "@walletconnect/web3-provider"
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk"
+import { loadConnectKit } from "@ledgerhq/connect-kit-loader"
 
 export const providerOptions = {
     walletlink: {
@@ -11,6 +12,12 @@ export const providerOptions = {
     },
     walletconnect: {
         package: WalletConnect, // required
+        options: {
+            infuraId: "", // required
+        },
+    },
+    ledger: {
+        package: loadConnectKit, // required
         options: {
             infuraId: "", // required
         },
