@@ -4,8 +4,6 @@ import { ethers } from "ethers"
 
 import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName } from "wagmi"
 
-import ChainButton from "./ChainButton"
-
 import "@rainbow-me/rainbowkit/styles.css"
 import { useConnectModal, useAccountModal, useChainModal } from "@rainbow-me/rainbowkit"
 
@@ -46,8 +44,8 @@ export default function WalletButton() {
     // Connect to wallet
     const connectWallet = async () => {
         try {
-            setLibrary(new ethers.providers.Web3Provider(provider))
-            // const library = new ethers.providers.Web3Provider(provider)
+            // setLibrary(new ethers.providers.Web3Provider(provider))
+            const library = new ethers.providers.Web3Provider(provider)
             const accounts = await library.listAccounts()
             const network = await library.getNetwork()
             console.log("network", network)
