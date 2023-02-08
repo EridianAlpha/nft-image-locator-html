@@ -4,10 +4,7 @@ import { ethers } from "ethers"
 
 import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName } from "wagmi"
 
-import ChainButton from "./ChainButton"
-
-import "@rainbow-me/rainbowkit/styles.css"
-import { useConnectModal, useAccountModal, useChainModal } from "@rainbow-me/rainbowkit"
+import WalletButtonModal from "./WalletButtonModal"
 
 import {
     Box,
@@ -17,11 +14,11 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    Image,
+    useDisclosure,
 } from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWallet, faChain } from "@fortawesome/free-solid-svg-icons"
+import { faWallet } from "@fortawesome/free-solid-svg-icons"
 
 export default function WalletButton() {
     const [provider, setProvider] = useState<any>()
@@ -35,23 +32,18 @@ export default function WalletButton() {
     const [signedMessage, setSignedMessage] = useState<any>("")
     const [verified, setVerified] = useState<any>()
 
-    const { address, isConnecting, isConnected } = useAccount()
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    const { address, connector, isConnected } = useAccount()
     const { data: ensAvatar } = useEnsAvatar({ address })
     const { data: ensName } = useEnsName({ address })
-
-    const { openConnectModal } = useConnectModal()
-    const { openAccountModal } = useAccountModal()
-    const { openChainModal } = useChainModal()
 
     // Connect to wallet
     const connectWallet = async () => {
         try {
-            setLibrary(new ethers.providers.Web3Provider(provider))
-            // const library = new ethers.providers.Web3Provider(provider)
+            const library = new ethers.providers.Web3Provider(provider)
             const accounts = await library.listAccounts()
             const network = await library.getNetwork()
-            console.log("network", network)
-
             setProvider(provider)
             setLibrary(library)
             if (accounts) setAccount(accounts[0])
@@ -168,17 +160,6 @@ export default function WalletButton() {
         <Box>
             {isConnected ? (
                 <Box paddingLeft={10}>
-                    <IconButton
-                        marginRight={2}
-                        onClick={async () => {
-                            openChainModal()
-                            window!.localStorage.setItem("connected", "injected")
-                        }}
-                        // disabled={isLoading}
-                        aria-label={"Connect wallet"}
-                    >
-                        <Image src={"./EthereumLogo.svg"}></Image>
-                    </IconButton>
                     <Menu>
                         <MenuButton as={IconButton}>
                             <Text margin={3}>{truncateAddress(address)}</Text>
@@ -200,7 +181,7 @@ export default function WalletButton() {
                 <Box paddingLeft={10}>
                     <IconButton
                         onClick={async () => {
-                            openConnectModal()
+                            onOpen()
                             window!.localStorage.setItem("connected", "injected")
                         }}
                         // disabled={isLoading}
@@ -210,6 +191,7 @@ export default function WalletButton() {
                     </IconButton>
                 </Box>
             )}
+            <WalletButtonModal isOpen={isOpen} closeModal={onClose} />
         </Box>
     )
 }

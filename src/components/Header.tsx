@@ -19,11 +19,14 @@ export default function Header() {
                     </HStack>
                     <HStack>
                         <ColorModeToggle />
-                        <IconButton aria-label={"View GitHub Source"}>
-                            <Link href={"https://github.com"}>
+                        <Link
+                            href={"https://github.com/EridianAlpha/nft-image-locator-html"}
+                            target="_blank"
+                        >
+                            <IconButton aria-label={"View GitHub Source"}>
                                 <FontAwesomeIcon icon={faGithub} size={"lg"} />
-                            </Link>
-                        </IconButton>
+                            </IconButton>
+                        </Link>
                         <WalletButton />
                         <Flex alignItems={"center"}></Flex>
                     </HStack>
