@@ -42,7 +42,11 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
                                 variant="outline"
                                 key={connector.id}
                                 disabled={!connector.ready}
-                                onClick={() => connect({ connector })}
+                                onClick={() => {
+                                    connect({ connector })
+                                    closeModal()
+                                    // TODO Only close modal when connection is successful
+                                }}
                                 w="100%"
                             >
                                 <HStack w="100%" justifyContent="center">

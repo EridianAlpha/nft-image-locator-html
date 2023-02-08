@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { toHex, truncateAddress } from "../../utils"
 import { ethers } from "ethers"
 
+import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName } from "wagmi"
+
 import WalletButtonModal from "./WalletButtonModal"
 
 import {
@@ -31,6 +33,12 @@ export default function WalletButton() {
     const [verified, setVerified] = useState<any>()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
+
+    const { address, connector, isConnected } = useAccount()
+    const { data: ensAvatar } = useEnsAvatar({ address })
+    const { data: ensName } = useEnsName({ address })
+
+    const { connect, connectors, isLoading, pendingConnector } = useConnect()
 
     // Connect to wallet
     const connectWallet = async () => {
@@ -112,11 +120,7 @@ export default function WalletButton() {
         setSignature("")
         setVerified(undefined)
     }
-
-    const disconnect = async () => {
-        // await web3Modal.clearCachedProvider()
-        refreshState()
-    }
+    const { disconnect } = useDisconnect()
 
     useEffect(() => {
         // if (web3Modal.cachedProvider) {
@@ -156,18 +160,18 @@ export default function WalletButton() {
 
     return (
         <Box>
-            {account ? (
+            {isConnected ? (
                 <Box paddingLeft={10}>
                     <Menu>
                         <MenuButton as={IconButton}>
-                            <Text margin={3}>{truncateAddress(account)}</Text>
+                            <Text margin={3}>{truncateAddress(address)}</Text>
                         </MenuButton>
                         <MenuList>
                             <MenuItem
                                 onClick={async () => {
                                     window.localStorage.removeItem("connected")
-                                    // await deactivateWeb3()
                                     disconnect()
+                                    refreshState()
                                 }}
                             >
                                 Disconnect
@@ -180,10 +184,9 @@ export default function WalletButton() {
                     <IconButton
                         onClick={async () => {
                             onOpen()
-                            // await enableWeb3()
                             window!.localStorage.setItem("connected", "injected")
                         }}
-                        // disabled={isWeb3EnableLoading}
+                        // disabled={isLoading}
                         aria-label={"Connect wallet"}
                     >
                         <FontAwesomeIcon icon={faWallet} size={"lg"} />
