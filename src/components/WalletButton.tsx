@@ -38,8 +38,6 @@ export default function WalletButton() {
     const { data: ensAvatar } = useEnsAvatar({ address })
     const { data: ensName } = useEnsName({ address })
 
-    const { connect, connectors, isLoading, pendingConnector } = useConnect()
-
     // Connect to wallet
     const connectWallet = async () => {
         try {

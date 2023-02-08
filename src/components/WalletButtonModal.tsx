@@ -28,12 +28,13 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
     return (
         <Modal isOpen={isOpen} onClose={closeModal} isCentered>
             <ModalOverlay />
-            <ModalContent w="300px">
-                <ModalHeader>Select Wallet</ModalHeader>
+            <ModalContent w="300px" rounded={20}>
+                <ModalHeader>Connect a Wallet</ModalHeader>
                 <ModalCloseButton
                     _focus={{
                         boxShadow: "none",
                     }}
+                    sx={{ marginTop: "7px" }}
                 />
                 <ModalBody paddingBottom="1.5rem">
                     <VStack>
