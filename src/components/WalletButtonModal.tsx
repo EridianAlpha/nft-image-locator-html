@@ -45,7 +45,6 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
                                 onClick={() => {
                                     connect({ connector })
                                     closeModal()
-                                    // TODO Only close modal when connection is successful
                                 }}
                                 w="100%"
                             >
@@ -66,7 +65,6 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
                                 </HStack>
                             </Button>
                         ))}
-                        {error && <Text>{error.message}</Text>}
                     </VStack>
                 </ModalBody>
             </ModalContent>
