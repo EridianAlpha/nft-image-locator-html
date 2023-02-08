@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { toHex, truncateAddress } from "../../utils"
 import { ethers } from "ethers"
 
+import ClientOnly from "./ClientOnly"
+
 import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName } from "wagmi"
 
 import "@rainbow-me/rainbowkit/styles.css"
@@ -164,50 +166,55 @@ export default function WalletButton() {
 
     return (
         <Box>
-            {isConnected ? (
-                <Box paddingLeft={10}>
-                    <IconButton
-                        marginRight={2}
-                        onClick={async () => {
-                            openChainModal()
-                            window!.localStorage.setItem("connected", "injected")
-                        }}
-                        // disabled={isLoading}
-                        aria-label={"Connect wallet"}
-                    >
-                        <Image src={"./EthereumLogo.svg"}></Image>
-                    </IconButton>
-                    <Menu>
-                        <MenuButton as={IconButton}>
-                            <Text margin={3}>{truncateAddress(address)}</Text>
-                        </MenuButton>
-                        <MenuList>
-                            <MenuItem
-                                onClick={async () => {
-                                    window.localStorage.removeItem("connected")
-                                    disconnect()
-                                    refreshState()
-                                }}
-                            >
-                                Disconnect
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Box>
-            ) : (
-                <Box paddingLeft={10}>
-                    <IconButton
-                        onClick={async () => {
-                            openConnectModal()
-                            window!.localStorage.setItem("connected", "injected")
-                        }}
-                        // disabled={isLoading}
-                        aria-label={"Connect wallet"}
-                    >
-                        <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                    </IconButton>
-                </Box>
-            )}
+            <ClientOnly>
+                {isConnected ? (
+                    <Box paddingLeft={10}>
+                        <IconButton
+                            marginRight={2}
+                            onClick={async () => {
+                                openChainModal ? openChainModal() : null
+                                window!.localStorage.setItem("connected", "injected")
+                            }}
+                            // disabled={isLoading}
+                            aria-label={"Connect wallet"}
+                        >
+                            <Image src={"./EthereumLogo.svg"}></Image>
+                        </IconButton>
+                        <Menu>
+                            <MenuButton as={IconButton}>
+                                {address ? (
+                                    <Text margin={3}>{truncateAddress(address)}</Text>
+                                ) : null}
+                            </MenuButton>
+                            <MenuList>
+                                <MenuItem
+                                    onClick={async () => {
+                                        window.localStorage.removeItem("connected")
+                                        disconnect()
+                                        refreshState()
+                                    }}
+                                >
+                                    Disconnect
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </Box>
+                ) : (
+                    <Box paddingLeft={10}>
+                        <IconButton
+                            onClick={async () => {
+                                openConnectModal ? openConnectModal() : null
+
+                                window!.localStorage.setItem("connected", "injected")
+                            }}
+                            // disabled={isLoading}
+                            aria-label={"Connect wallet"}
+                        >
+                            <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                        </IconButton>
+                    </Box>
+                )}
+            </ClientOnly>
         </Box>
     )
 }

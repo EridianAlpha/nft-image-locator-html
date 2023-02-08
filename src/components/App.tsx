@@ -10,7 +10,7 @@ const App = () => {
             <Header></Header>
             <Flex height="50vh" alignItems="center" justifyContent="center">
                 <Flex direction="column" background={formBackground} p={12} rounded={6}>
-                    <Heading mb={6}>Where's My NFT?</Heading>
+                    <Heading mb={6}>Where&apos;s My NFT?</Heading>
                 </Flex>
             </Flex>
         </>

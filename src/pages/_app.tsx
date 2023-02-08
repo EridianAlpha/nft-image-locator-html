@@ -28,8 +28,11 @@ const wagmiClient = createClient({
     provider,
 })
 
+// import ClientOnly from "../components/ClientOnly"
+
 function MyApp({ Component, pageProps }: AppProps) {
     return (
+        // <ClientOnly>
         <ChakraProvider>
             <WagmiConfig client={wagmiClient}>
                 <RainbowKitProvider theme={darkTheme()} chains={chains}>
@@ -37,6 +40,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 </RainbowKitProvider>
             </WagmiConfig>
         </ChakraProvider>
+        // </ClientOnly>
     )
 }
 
