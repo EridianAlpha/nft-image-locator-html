@@ -1,23 +1,38 @@
+import { WagmiConfig, createClient, configureChains, mainnet } from "wagmi"
+
+import { alchemyProvider } from "wagmi/providers/alchemy"
+import { publicProvider } from "wagmi/providers/public"
+
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
+import { InjectedConnector } from "wagmi/connectors/injected"
 import { MetaMaskConnector } from "wagmi/connectors/metaMask"
-import { chain } from "wagmi"
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 
-const APP_NAME = "Health Verify"
-const APP_LOGO_URL =
-    "https://ethereum.org/static/a110735dade3f354a46fc2446cd52476/f3a29/eth-home-icon.webp"
+// Configure chains & providers with the Alchemy provider.
+// Two popular providers are Alchemy (alchemy.com) and Infura (infura.io)
+const { chains, provider, webSocketProvider } = configureChains(
+    [mainnet],
+    [alchemyProvider({ apiKey: "yourAlchemyApiKey" }), publicProvider()]
+)
 
-export const connectors = [
-    new CoinbaseWalletConnector({
-        chains: [chain.mainnet],
-        options: {
-            appName: APP_NAME,
-            appLogoUrl: APP_LOGO_URL,
-        },
-    }),
-    new MetaMaskConnector({
-        chains: [chain.mainnet],
-        options: {
-            shimChainChangedDisconnect: false,
-        },
-    }),
-]
+// Set up client
+export const client = createClient({
+    autoConnect: true,
+    connectors: [
+        new MetaMaskConnector({ chains }),
+        new CoinbaseWalletConnector({
+            chains,
+            options: {
+                appName: "wagmi",
+            },
+        }),
+        new WalletConnectConnector({
+            chains,
+            options: {
+                qrcode: true,
+            },
+        }),
+    ],
+    provider,
+    webSocketProvider,
+})

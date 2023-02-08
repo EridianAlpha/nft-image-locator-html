@@ -18,8 +18,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWallet } from "@fortawesome/free-solid-svg-icons"
 
-import { useAccount, useConnect } from "wagmi"
-
 export default function WalletButton() {
     const [provider, setProvider] = useState<any>()
     const [library, setLibrary] = useState<any>()
@@ -32,14 +30,11 @@ export default function WalletButton() {
     const [signedMessage, setSignedMessage] = useState<any>("")
     const [verified, setVerified] = useState<any>()
 
-    // const { data: account } = useAccount()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Connect to wallet
     const connectWallet = async () => {
         try {
-            // const provider = await web3Modal.connect()
-            onOpen()
             const library = new ethers.providers.Web3Provider(provider)
             const accounts = await library.listAccounts()
             const network = await library.getNetwork()
@@ -170,7 +165,7 @@ export default function WalletButton() {
                         <MenuList>
                             <MenuItem
                                 onClick={async () => {
-                                    // window.localStorage.removeItem("connected")
+                                    window.localStorage.removeItem("connected")
                                     // await deactivateWeb3()
                                     disconnect()
                                 }}
@@ -184,9 +179,9 @@ export default function WalletButton() {
                 <Box paddingLeft={10}>
                     <IconButton
                         onClick={async () => {
-                            connectWallet()
+                            onOpen()
                             // await enableWeb3()
-                            // window!.localStorage.setItem("connected", "injected")
+                            window!.localStorage.setItem("connected", "injected")
                         }}
                         // disabled={isWeb3EnableLoading}
                         aria-label={"Connect wallet"}

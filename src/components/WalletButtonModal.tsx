@@ -13,15 +13,17 @@ import {
 } from "@chakra-ui/react"
 import { useConnect } from "wagmi"
 
+import { client } from "../utils/connectors"
+
+const connectors = client.connectors
+
 export type SelectWalletModalProps = {
     isOpen: boolean
     closeModal: () => void
 }
 
 export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletModalProps) {
-    const { data } = useConnect()
-    const { activeConnector, connect, connectors, error, isConnecting, pendingConnector } =
-        useConnect()
+    const { connect, error, isLoading, pendingConnector } = useConnect()
 
     return (
         <Modal isOpen={isOpen} onClose={closeModal} isCentered>
@@ -35,63 +37,32 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
                 />
                 <ModalBody paddingBottom="1.5rem">
                     <VStack>
-                        <Button
-                            variant="outline"
-                            // onClick={() => {
-                            //     activate(connectors.injected)
-                            //     closeModal()
-                            // }}
-                            w="100%"
-                        >
-                            <HStack w="100%" justifyContent="center">
-                                <Image
-                                    src="/mm.png"
-                                    alt="Metamask Logo"
-                                    width={25}
-                                    height={25}
-                                    borderRadius="3px"
-                                />
-                                <Text>Metamask</Text>
-                            </HStack>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            // onClick={() => {
-                            //     activate(connectors.walletConnect)
-                            //     closeModal()
-                            // }}
-                            w="100%"
-                        >
-                            <HStack w="100%" justifyContent="center">
-                                <Image
-                                    src="/wc.png"
-                                    alt="Wallet Connect Logo"
-                                    width={26}
-                                    height={26}
-                                    borderRadius="3px"
-                                />
-                                <Text>Wallet Connect</Text>
-                            </HStack>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            // onClick={() => {
-                            //     activate(connectors.coinbaseWallet)
-                            //     closeModal()
-                            // }}
-                            w="100%"
-                        >
-                            <HStack w="100%" justifyContent="center">
-                                <Image
-                                    src="/cbw.png"
-                                    alt="Coinbase Wallet Logo"
-                                    width={25}
-                                    height={25}
-                                    borderRadius="3px"
-                                />
-                                <Text>Coinbase Wallet</Text>
-                            </HStack>
-                        </Button>
+                        {connectors.map((connector) => (
+                            <Button
+                                variant="outline"
+                                key={connector.id}
+                                disabled={!connector.ready}
+                                onClick={() => connect({ connector })}
+                                w="100%"
+                            >
+                                <HStack w="100%" justifyContent="center">
+                                    <Image
+                                        width={26}
+                                        height={26}
+                                        borderRadius="3px"
+                                        src={walletIcons(connector.name)}
+                                        alt={"Wallet"}
+                                    ></Image>
+                                    <Text>
+                                        {connector.name}{" "}
+                                        {isLoading &&
+                                            connector.id === pendingConnector?.id &&
+                                            " (connecting)"}
+                                    </Text>
+                                </HStack>
+                            </Button>
+                        ))}
+                        {error && <Text>{error.message}</Text>}
                     </VStack>
                 </ModalBody>
             </ModalContent>
@@ -99,4 +70,12 @@ export default function SelectWalletModal({ isOpen, closeModal }: SelectWalletMo
     )
 }
 
-const walletIcons = (walletName: string) => (walletName === "MetaMask" ? "mm.png" : "/cbw.png")
+function walletIcons(walletName: string) {
+    if (walletName === "MetaMask") {
+        return "mm.png"
+    } else if (walletName === "Coinbase Wallet") {
+        return "/cbw.png"
+    } else if (walletName === "WalletConnect") {
+        return "/wc.png"
+    }
+}
