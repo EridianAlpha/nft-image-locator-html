@@ -40,14 +40,20 @@ export default function WalletButton() {
     const { data: ensName } = useEnsName({ address })
 
     const { openConnectModal } = useConnectModal()
-    const { openAccountModal } = useAccountModal()
     const { openChainModal } = useChainModal()
 
     // Connect to wallet
     const connectWallet = async () => {
         try {
-            // setLibrary(new ethers.providers.Web3Provider(provider))
-            const library = new ethers.providers.Web3Provider(provider)
+            console.log("HERE1")
+            useEffect(() => {
+                const provider = window.localStorage.getItem("provider")
+                if (provider) activate(connectors[provider])
+            }, [])
+            setLibrary(new ethers.providers.Web3Provider(provider))
+            // const library = new ethers.providers.Web3Provider(provider)
+            console.log(library, "library")
+
             const accounts = await library.listAccounts()
             const network = await library.getNetwork()
             console.log("network", network)
@@ -56,6 +62,7 @@ export default function WalletButton() {
             setLibrary(library)
             if (accounts) setAccount(accounts[0])
             setChainId(network.chainId)
+            console.log("chainId", chainId)
         } catch (error) {
             setError(error)
         }
@@ -214,6 +221,15 @@ export default function WalletButton() {
                         </IconButton>
                     </Box>
                 )}
+                <Box paddingLeft={10}>
+                    <IconButton
+                        onClick={async () => {
+                            console.log("CLICK")
+                            connectWallet()
+                        }}
+                        aria-label={"Test wallet"}
+                    ></IconButton>
+                </Box>
             </ClientOnly>
         </Box>
     )
