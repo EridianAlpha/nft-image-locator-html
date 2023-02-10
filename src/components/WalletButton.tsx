@@ -1,14 +1,14 @@
-import { useEffect, useState, useContext } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import { toHex, truncateAddress } from "../utils/utils"
 
 import { WalletConnectedContext } from "../utils/context"
 
 import ClientOnly from "./ClientOnly"
 
-import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName, useProvider } from "wagmi"
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName, useProvider } from "wagmi"
 
 import "@rainbow-me/rainbowkit/styles.css"
-import { useConnectModal, useAccountModal, useChainModal } from "@rainbow-me/rainbowkit"
+import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit"
 
 import {
     Box,
@@ -28,7 +28,8 @@ export default function WalletButton() {
     const [error, setError] = useState<any>("")
 
     // Everything comes from Wagmi
-    const { address, isConnecting, isConnected } = useAccount()
+    const { address, isConnected, status } = useAccount()
+
     const { data: ensAvatar } = useEnsAvatar({ address })
     const { data: ensName } = useEnsName({ address })
     const provider = useProvider()
@@ -53,16 +54,27 @@ export default function WalletButton() {
     useEffect(() => {
         if (window.localStorage.getItem("connected")) {
             setWalletConnected(true)
-            // This causes the modal to appear for a split second
-            // so I need to find a way to connect without opening the modal (or as a hack hide the modal when it opens that time)
-            openConnectModal ? openConnectModal() : null
         }
     }, [])
+
+    // Keep rerendering the page until the wallet is connected
+    // This isn't a great solution but it works
+    const [render, rerender] = useState(false)
+    const [trigger, setTrigger] = useState(true)
+
+    useEffect(() => {
+        if (trigger && !isConnected && status != "disconnected") {
+            rerender(!render)
+        }
+        if (trigger && isConnected) {
+            setTrigger(false)
+        }
+    })
 
     return (
         <Box>
             <ClientOnly>
-                {isConnected ? (
+                {isConnected && window.localStorage.getItem("connected") ? (
                     <Box paddingLeft={10}>
                         <IconButton
                             marginRight={2}
@@ -96,7 +108,6 @@ export default function WalletButton() {
                         <IconButton
                             onClick={async () => {
                                 openConnectModal ? openConnectModal() : null
-
                                 window!.localStorage.setItem("connected", "injected")
                             }}
                             aria-label={"Connect wallet"}
