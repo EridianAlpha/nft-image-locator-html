@@ -5,7 +5,7 @@ import { WalletConnectedContext } from "../utils/context"
 
 import ClientOnly from "./ClientOnly"
 
-import { useAccount, useDisconnect, useEnsAvatar, useEnsName, useProvider } from "wagmi"
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName, useProvider, useNetwork } from "wagmi"
 
 import "@rainbow-me/rainbowkit/styles.css"
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit"
@@ -21,36 +21,33 @@ import {
     Image,
     Spinner,
     Flex,
+    Button,
+    Center,
 } from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWallet } from "@fortawesome/free-solid-svg-icons"
 
 export default function WalletButton() {
-    const [error, setError] = useState<any>("")
-
     // Everything comes from Wagmi
+    const provider = useProvider()
     const { address, isConnected, status } = useAccount()
-
+    const { disconnect } = useDisconnect()
+    const { chain } = useNetwork()
     const { data: ensAvatar } = useEnsAvatar({ address })
     const { data: ensName } = useEnsName({ address })
-    const provider = useProvider()
 
     const { openConnectModal } = useConnectModal()
     const { openChainModal } = useChainModal()
 
     let chainIcon
-    if (provider._network.chainId === 1) {
+    if (chain?.id === 1) {
         chainIcon = "./EthereumLogo.svg"
     } else if (provider._network.chainId === 5) {
         chainIcon = "./GoerliLogo.svg"
     }
 
-    const { disconnect } = useDisconnect()
     const { walletConnected, setWalletConnected } = useContext(WalletConnectedContext)
-
-    const [openChainModalState, setOpenChainModalState] = useState(openChainModal)
-    const [walletConnectedState, setWalletConnectedState] = useState(walletConnected)
 
     // Check local storage for "connected" item
     // if it exists, set the state to true so the wallet
@@ -62,34 +59,35 @@ export default function WalletButton() {
         }
     }, [isConnected])
 
-    const WalletIconButton = () => {
-        return (
-            <>
-                {status == "connecting" && window.localStorage.getItem("connected") ? (
-                    <Flex>
-                        <Text as="b">Connecting...&nbsp;&nbsp;&nbsp;&nbsp;</Text>
-                        <Spinner />
-                    </Flex>
-                ) : (
-                    <IconButton
-                        onClick={async () => {
-                            openConnectModal ? openConnectModal() : null
-                            window!.localStorage.setItem("connected", "injected")
-                        }}
-                        aria-label={"Connect wallet"}
-                    >
-                        <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                    </IconButton>
-                )}
-            </>
-        )
+    // Rerender when chainId changes
+    const [render, rerender] = useState(false)
+    useEffect(() => {
+        rerender(!render)
+    }, [chain?.id])
+
+    // Rerender when wallet account (address) changes
+    // I think this will only work for MetaMask
+    const [currentAccount, setCurrentAccount] = useState("")
+    const checkIfAccountChanged = async () => {
+        try {
+            const { ethereum } = window
+            ethereum!.on("accountsChanged", (accounts: any) => {
+                console.log("Account changed to:", accounts[0])
+                setCurrentAccount(accounts[0])
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
+    useEffect(() => {
+        checkIfAccountChanged()
+    }, [])
 
     return (
         <Box>
             <ClientOnly>
                 <Box paddingLeft={10}>
-                    {walletConnected && isConnected && window.localStorage.getItem("connected") ? (
+                    {isConnected && walletConnected && window.localStorage.getItem("connected") ? (
                         <>
                             <IconButton
                                 marginRight={2}
@@ -104,7 +102,9 @@ export default function WalletButton() {
                                 <MenuButton as={IconButton}>
                                     {address ? (
                                         <Text margin={3}>{truncateAddress(address)}</Text>
-                                    ) : null}
+                                    ) : (
+                                        "No address"
+                                    )}
                                 </MenuButton>
                                 <MenuList>
                                     <MenuItem
@@ -120,18 +120,35 @@ export default function WalletButton() {
                             </Menu>
                         </>
                     ) : (
-                        <WalletIconButton />
-                        // <>
-                        //     <IconButton
-                        //         onClick={async () => {
-                        //             openConnectModal ? openConnectModal() : null
-                        //             window!.localStorage.setItem("connected", "injected")
-                        //         }}
-                        //         aria-label={"Connect wallet"}
-                        //     >
-                        //         <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                        //     </IconButton>
-                        // </>
+                        <>
+                            {status == "connecting" && window.localStorage.getItem("connected") ? (
+                                <Button
+                                    // marginRight={4}
+                                    onClick={async () => {
+                                        window.localStorage.removeItem("connected")
+                                        disconnect()
+                                        setWalletConnected(false)
+                                    }}
+                                >
+                                    <Flex>
+                                        <Center>
+                                            <Text as="b">Connecting...&nbsp;</Text>
+                                            <Spinner />
+                                        </Center>
+                                    </Flex>
+                                </Button>
+                            ) : (
+                                <IconButton
+                                    onClick={async () => {
+                                        openConnectModal ? openConnectModal() : null
+                                        window!.localStorage.setItem("connected", "injected")
+                                    }}
+                                    aria-label={"Connect wallet"}
+                                >
+                                    <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                                </IconButton>
+                            )}
+                        </>
                     )}
                 </Box>
             </ClientOnly>
