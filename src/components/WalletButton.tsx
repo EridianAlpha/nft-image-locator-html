@@ -47,6 +47,9 @@ export default function WalletButton() {
     const { disconnect } = useDisconnect()
     const { walletConnected, setWalletConnected } = useContext(WalletConnectedContext)
 
+    const [openChainModalState, setOpenChainModalState] = useState(openChainModal)
+    const [walletConnectedState, setWalletConnectedState] = useState(walletConnected)
+
     // Check local storage for "connected" item
     // if it exists, set the state to true so the wallet
     // appears to auto-connect but doesn't if the user previously
@@ -55,26 +58,12 @@ export default function WalletButton() {
         if (window.localStorage.getItem("connected")) {
             setWalletConnected(true)
         }
-    }, [])
-
-    // Keep rerendering the page until the wallet is connected
-    // This isn't a great solution but it works
-    const [render, rerender] = useState(false)
-    const [trigger, setTrigger] = useState(true)
-
-    useEffect(() => {
-        if (trigger && !isConnected && status != "disconnected") {
-            rerender(!render)
-        }
-        if (trigger && isConnected) {
-            setTrigger(false)
-        }
-    })
+    }, [isConnected])
 
     return (
         <Box>
             <ClientOnly>
-                {isConnected && window.localStorage.getItem("connected") ? (
+                {walletConnected && isConnected && window.localStorage.getItem("connected") ? (
                     <Box paddingLeft={10}>
                         <IconButton
                             marginRight={2}
@@ -96,6 +85,7 @@ export default function WalletButton() {
                                     onClick={async () => {
                                         window.localStorage.removeItem("connected")
                                         disconnect()
+                                        setWalletConnected(false)
                                     }}
                                 >
                                     Disconnect

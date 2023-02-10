@@ -42,6 +42,18 @@ function MyApp({ Component, pageProps }: AppProps) {
         provider,
     })
 
+    // This is a hack to get the wallet to auto-connect
+    // but only when the user has previously connected
+    // and not manually disconnected
+    const [render, rerender] = useState(false)
+    useEffect(() => {
+        setTimeout(() => {
+            if (window.localStorage.getItem("connected")) {
+                rerender(!render)
+            }
+        }, 200)
+    }, [walletConnected])
+
     return (
         <ChakraProvider>
             <ThemeContext.Provider value={{ theme, setTheme }}>
