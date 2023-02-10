@@ -19,6 +19,8 @@ import {
     MenuItem,
     Menu,
     Image,
+    Spinner,
+    Flex,
 } from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -60,52 +62,78 @@ export default function WalletButton() {
         }
     }, [isConnected])
 
+    const WalletIconButton = () => {
+        return (
+            <>
+                {status == "connecting" && window.localStorage.getItem("connected") ? (
+                    <Flex>
+                        <Text as="b">Connecting...&nbsp;&nbsp;&nbsp;&nbsp;</Text>
+                        <Spinner />
+                    </Flex>
+                ) : (
+                    <IconButton
+                        onClick={async () => {
+                            openConnectModal ? openConnectModal() : null
+                            window!.localStorage.setItem("connected", "injected")
+                        }}
+                        aria-label={"Connect wallet"}
+                    >
+                        <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                    </IconButton>
+                )}
+            </>
+        )
+    }
+
     return (
         <Box>
             <ClientOnly>
-                {walletConnected && isConnected && window.localStorage.getItem("connected") ? (
-                    <Box paddingLeft={10}>
-                        <IconButton
-                            marginRight={2}
-                            onClick={async () => {
-                                openChainModal ? openChainModal() : null
-                            }}
-                            aria-label={"Switch chain"}
-                        >
-                            <Image src={chainIcon}></Image>
-                        </IconButton>
-                        <Menu>
-                            <MenuButton as={IconButton}>
-                                {address ? (
-                                    <Text margin={3}>{truncateAddress(address)}</Text>
-                                ) : null}
-                            </MenuButton>
-                            <MenuList>
-                                <MenuItem
-                                    onClick={async () => {
-                                        window.localStorage.removeItem("connected")
-                                        disconnect()
-                                        setWalletConnected(false)
-                                    }}
-                                >
-                                    Disconnect
-                                </MenuItem>
-                            </MenuList>
-                        </Menu>
-                    </Box>
-                ) : (
-                    <Box paddingLeft={10}>
-                        <IconButton
-                            onClick={async () => {
-                                openConnectModal ? openConnectModal() : null
-                                window!.localStorage.setItem("connected", "injected")
-                            }}
-                            aria-label={"Connect wallet"}
-                        >
-                            <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                        </IconButton>
-                    </Box>
-                )}
+                <Box paddingLeft={10}>
+                    {walletConnected && isConnected && window.localStorage.getItem("connected") ? (
+                        <>
+                            <IconButton
+                                marginRight={2}
+                                onClick={async () => {
+                                    openChainModal ? openChainModal() : null
+                                }}
+                                aria-label={"Switch chain"}
+                            >
+                                <Image src={chainIcon}></Image>
+                            </IconButton>
+                            <Menu>
+                                <MenuButton as={IconButton}>
+                                    {address ? (
+                                        <Text margin={3}>{truncateAddress(address)}</Text>
+                                    ) : null}
+                                </MenuButton>
+                                <MenuList>
+                                    <MenuItem
+                                        onClick={async () => {
+                                            window.localStorage.removeItem("connected")
+                                            disconnect()
+                                            setWalletConnected(false)
+                                        }}
+                                    >
+                                        Disconnect
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+                        </>
+                    ) : (
+                        <WalletIconButton />
+                        // <>
+                        //     <IconButton
+                        //         onClick={async () => {
+                        //             openConnectModal ? openConnectModal() : null
+                        //             window!.localStorage.setItem("connected", "injected")
+                        //         }}
+                        //         aria-label={"Connect wallet"}
+                        //     >
+                        //         <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                        //     </IconButton>
+                        // </>
+                    )}
+                </Box>
             </ClientOnly>
         </Box>
     )

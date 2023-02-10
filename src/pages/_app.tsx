@@ -51,7 +51,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             if (window.localStorage.getItem("connected")) {
                 rerender(!render)
             }
-        }, 200)
+        }, 500)
     }, [walletConnected])
 
     return (
