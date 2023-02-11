@@ -1,3 +1,5 @@
+import WalletButtonMenu from "./WalletButtonMenu"
+
 import React, { useEffect, useState, useContext } from "react"
 import { toHex, truncateAddress } from "../utils/utils"
 
@@ -87,9 +89,16 @@ export default function WalletButton() {
         checkIfAccountChanged()
     }, [])
 
-    const [width, setWidth] = useState(window.innerWidth)
+    // Rerender when window size changes and save
+    // window size to state to allow conditional rendering
+    const isSSR = typeof window === "undefined"
+    const [windowSize, setWindowSize] = React.useState({
+        width: isSSR ? 0 : window.innerWidth,
+        height: isSSR ? 0 : window.innerHeight,
+    })
     useEffect(() => {
-        const handleResizeWindow = () => setWidth(window.innerWidth)
+        const handleResizeWindow = () =>
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight })
         // subscribe to window resize event "onComponentDidMount"
         window.addEventListener("resize", handleResizeWindow)
         return () => {
@@ -114,26 +123,45 @@ export default function WalletButton() {
                                 aria-label={"Switch chain"}
                             >
                                 <Image src={chainIcon}></Image>
-                                {width > 600 ? <Text marginLeft={2}>{chainName}</Text> : null}
+                                {windowSize.width > 700 ? (
+                                    <Text marginLeft={2}>{chainName}</Text>
+                                ) : null}
                             </Button>
                             <Menu>
                                 <MenuButton as={IconButton}>
-                                    {address && ensName ? <Text margin={3}>{ensName}</Text> : null}
-                                    {address && !ensName ? (
-                                        <Text margin={3}>{truncateAddress(address)}</Text>
-                                    ) : null}
+                                    <Flex>
+                                        <Center>
+                                            {windowSize.width > 700 ? (
+                                                <>
+                                                    {address && ensName ? (
+                                                        <Text maxWidth={200} isTruncated margin={3}>
+                                                            {ensName}
+                                                        </Text>
+                                                    ) : null}
+                                                    {address && !ensName ? (
+                                                        <Text margin={3}>
+                                                            {truncateAddress(address)}
+                                                        </Text>
+                                                    ) : null}
+                                                    <Box marginRight={3}>
+                                                        <FontAwesomeIcon
+                                                            icon={faWallet}
+                                                            size={"lg"}
+                                                        />
+                                                    </Box>
+                                                </>
+                                            ) : (
+                                                <IconButton
+                                                    backgroundColor={"green"}
+                                                    aria-label={"Wallet button"}
+                                                >
+                                                    <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                                                </IconButton>
+                                            )}
+                                        </Center>
+                                    </Flex>
                                 </MenuButton>
-                                <MenuList>
-                                    <MenuItem
-                                        onClick={async () => {
-                                            window.localStorage.removeItem("connected")
-                                            disconnect()
-                                            setWalletConnected(false)
-                                        }}
-                                    >
-                                        Disconnect
-                                    </MenuItem>
-                                </MenuList>
+                                <WalletButtonMenu />
                             </Menu>
                         </>
                     ) : (
