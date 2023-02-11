@@ -41,10 +41,13 @@ export default function WalletButton() {
     const { openChainModal } = useChainModal()
 
     let chainIcon
+    let chainName
     if (chain?.id === 1) {
         chainIcon = "./EthereumLogo.svg"
+        chainName = "Mainnet"
     } else if (provider._network.chainId === 5) {
         chainIcon = "./GoerliLogo.svg"
+        chainName = "Goerli"
     }
 
     const { walletConnected, setWalletConnected } = useContext(WalletConnectedContext)
@@ -74,6 +77,7 @@ export default function WalletButton() {
             ethereum!.on("accountsChanged", (accounts: any) => {
                 console.log("Account changed to:", accounts[0])
                 setCurrentAccount(accounts[0])
+                console.log("currentAccount:", currentAccount)
             })
         } catch (error) {
             console.log(error)
@@ -83,28 +87,41 @@ export default function WalletButton() {
         checkIfAccountChanged()
     }, [])
 
+    const [width, setWidth] = useState(window.innerWidth)
+    useEffect(() => {
+        const handleResizeWindow = () => setWidth(window.innerWidth)
+        // subscribe to window resize event "onComponentDidMount"
+        window.addEventListener("resize", handleResizeWindow)
+        return () => {
+            // unsubscribe "onComponentDestroy"
+            window.removeEventListener("resize", handleResizeWindow)
+        }
+    }, [])
+
     return (
         <Box>
             <ClientOnly>
                 <Box paddingLeft={10}>
                     {isConnected && walletConnected && window.localStorage.getItem("connected") ? (
                         <>
-                            <IconButton
+                            <Button
                                 marginRight={2}
+                                paddingLeft={2}
+                                paddingRight={2}
                                 onClick={async () => {
                                     openChainModal ? openChainModal() : null
                                 }}
                                 aria-label={"Switch chain"}
                             >
                                 <Image src={chainIcon}></Image>
-                            </IconButton>
+                                {width > 600 ? <Text marginLeft={2}>{chainName}</Text> : null}
+                            </Button>
                             <Menu>
                                 <MenuButton as={IconButton}>
-                                    {address ? (
+                                    {address && ensName ? <Text margin={3}>{ensName}</Text> : null}
+                                    {address && !ensName ? (
                                         <Text margin={3}>{truncateAddress(address)}</Text>
-                                    ) : (
-                                        "No address"
-                                    )}
+                                    ) : null}
                                 </MenuButton>
                                 <MenuList>
                                     <MenuItem
@@ -123,7 +140,6 @@ export default function WalletButton() {
                         <>
                             {status == "connecting" && window.localStorage.getItem("connected") ? (
                                 <Button
-                                    // marginRight={4}
                                     onClick={async () => {
                                         window.localStorage.removeItem("connected")
                                         disconnect()
@@ -150,6 +166,15 @@ export default function WalletButton() {
                             )}
                         </>
                     )}
+                    {/* <IconButton
+                        onClick={async () => {
+                            console.log("Clicked!")
+                            console.log("ensAvatar:", ensAvatar)
+                            console.log("ensName:", ensName)
+                            console.log("width:", width)
+                        }}
+                        aria-label={"Test button"}
+                    ></IconButton> */}
                 </Box>
             </ClientOnly>
         </Box>
