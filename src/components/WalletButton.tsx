@@ -105,7 +105,7 @@ export default function WalletButton() {
     // Rerender when window size changes and save
     // window size to state to allow conditional rendering
     const isSSR = typeof window === "undefined"
-    const [windowSize, setWindowSize] = React.useState({
+    const [windowSize, setWindowSize] = useState({
         width: isSSR ? 0 : window.innerWidth,
         height: isSSR ? 0 : window.innerHeight,
     })
