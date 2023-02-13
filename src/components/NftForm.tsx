@@ -57,13 +57,31 @@ export default function NftForm() {
         setTokenUriJson("Loading")
         await fetch(tokenUri)
             .then(async (response) => {
-                if (!response.ok) throw new Error(response.statusText)
-                else setTokenUriJson(await response.json())
+                if (!response.ok) {
+                    setTokenUriJson(response.statusText)
+                    throw new Error(response.statusText)
+                } else {
+                    setTokenUriJson(await response.json())
+                }
             })
             .catch((error) => {
                 console.log("error: " + error)
             })
     }
+
+    // const keydownHandler = (e) => {
+    //     if (e.key === "Enter") {
+    //         console.log("tokenUri", tokenUri)
+    //         fetchUriData()
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     document.addEventListener("keydown", keydownHandler)
+    //     return () => {
+    //         document.removeEventListener("keydown", keydownHandler)
+    //     }
+    // }, [])
 
     return (
         <Flex alignItems="center" direction="column">
@@ -76,6 +94,11 @@ export default function NftForm() {
                             <Input
                                 placeholder="0x..."
                                 value={contractInput}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        fetchUriData()
+                                    }
+                                }}
                                 onInput={(e) =>
                                     setContractInput((e.target as HTMLInputElement).value)
                                 }
@@ -86,6 +109,11 @@ export default function NftForm() {
                             <Input
                                 placeholder="12345"
                                 value={tokenIdInput}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        fetchUriData()
+                                    }
+                                }}
                                 onInput={(e) =>
                                     setTokenIdInput((e.target as HTMLInputElement).value)
                                 }
