@@ -7,6 +7,7 @@ import { ThemeContext, WalletConnectedContext } from "../utils/context"
 import { ChakraProvider } from "@chakra-ui/react"
 import { WagmiConfig, createClient, configureChains, mainnet, goerli } from "wagmi"
 import { publicProvider } from "wagmi/providers/public"
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 
 import {
     getDefaultWallets,
@@ -31,7 +32,24 @@ function MyApp({ Component, pageProps }: AppProps) {
     const [walletConnected, setWalletConnected] = useState(false)
 
     // Create Wagmi client
-    const { chains, provider } = configureChains([mainnet, goerli], [publicProvider()])
+    const { chains, provider } = configureChains(
+        [mainnet, goerli],
+        [
+            // TODO: Doesn't work with basic auth in the RPC URL
+            // https://github.com/wagmi-dev/wagmi/discussions/1847
+            // *** Uncomment to use your own RPC URLs ***
+            // jsonRpcProvider({
+            //     priority: 0,
+            //     rpc: (chain) => ({
+            //         http:
+            //             chain.id === 1
+            //                 ? process.env.NEXT_PUBLIC_MAINNET_RPC_URL
+            //                 : process.env.NEXT_PUBLIC_GOERLI_RPC_URL,
+            //     }),
+            // }),
+            publicProvider(),
+        ]
+    )
     const { connectors } = getDefaultWallets({
         appName: "NFT Image Locator App",
         chains,
