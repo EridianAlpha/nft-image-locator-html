@@ -28,7 +28,7 @@ import {
 } from "@chakra-ui/react"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWallet } from "@fortawesome/free-solid-svg-icons"
+import { faWallet, faCopy } from "@fortawesome/free-solid-svg-icons"
 
 export default function WalletButton() {
     // Everything comes from Wagmi
@@ -36,14 +36,27 @@ export default function WalletButton() {
     const { address, isConnected, status } = useAccount()
     const { disconnect } = useDisconnect()
     const { chain } = useNetwork()
-    const { data: ensAvatar } = useEnsAvatar({ address })
+
+    const {
+        data: ensAvatar,
+        isLoading: ensAvatarLoading,
+        isError: ensAvatarError,
+    } = useEnsAvatar({
+        address: address,
+        cacheTime: 2_000,
+    })
+
     const { data: ensName } = useEnsName({ address })
 
     const { openConnectModal } = useConnectModal()
     const { openChainModal } = useChainModal()
 
-    let chainIcon
-    let chainName
+    // Store the state of the copy icon on the menu so it can be
+    // reset when the menu is closed
+    const [copyIcon, setCopyIcon] = useState(<FontAwesomeIcon icon={faCopy} size={"lg"} />)
+
+    let chainIcon: string
+    let chainName: string
     if (chain?.id === 1) {
         chainIcon = "./EthereumLogo.svg"
         chainName = "Mainnet"
@@ -127,41 +140,67 @@ export default function WalletButton() {
                                     <Text marginLeft={2}>{chainName}</Text>
                                 ) : null}
                             </Button>
-                            <Menu>
-                                <MenuButton as={IconButton}>
-                                    <Flex>
-                                        <Center>
-                                            {windowSize.width > 700 ? (
-                                                <>
-                                                    {address && ensName ? (
-                                                        <Text maxWidth={200} isTruncated margin={3}>
-                                                            {ensName}
-                                                        </Text>
-                                                    ) : null}
-                                                    {address && !ensName ? (
-                                                        <Text margin={3}>
-                                                            {truncateAddress(address)}
-                                                        </Text>
-                                                    ) : null}
+                            <Menu
+                                onClose={() => {
+                                    setTimeout(function () {
+                                        setCopyIcon(<FontAwesomeIcon icon={faCopy} size={"lg"} />)
+                                    }, 100)
+                                }}
+                            >
+                                {windowSize.width > 700 ? (
+                                    <MenuButton as={IconButton} aria-label={"Wallet button"}>
+                                        <Flex>
+                                            <Center>
+                                                {address && ensName ? (
+                                                    <Text maxWidth={200} isTruncated margin={3}>
+                                                        {ensName}
+                                                    </Text>
+                                                ) : null}
+                                                {address && !ensName ? (
+                                                    <Text margin={3}>
+                                                        {truncateAddress(address, "short")}
+                                                    </Text>
+                                                ) : null}
+                                                {address && !ensAvatar ? (
                                                     <Box marginRight={3}>
                                                         <FontAwesomeIcon
                                                             icon={faWallet}
                                                             size={"lg"}
                                                         />
                                                     </Box>
-                                                </>
-                                            ) : (
-                                                <IconButton
-                                                    backgroundColor={"green"}
-                                                    aria-label={"Wallet button"}
-                                                >
-                                                    <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                                                </IconButton>
-                                            )}
-                                        </Center>
-                                    </Flex>
-                                </MenuButton>
-                                <WalletButtonMenu />
+                                                ) : (
+                                                    <Image
+                                                        boxSize="2rem"
+                                                        borderRadius="full"
+                                                        mr="12px"
+                                                        src={ensAvatar}
+                                                    ></Image>
+                                                )}
+                                            </Center>
+                                        </Flex>
+                                    </MenuButton>
+                                ) : (
+                                    <MenuButton as={IconButton} aria-label={"Wallet button"}>
+                                        {address && !ensAvatar ? (
+                                            <Box>
+                                                <FontAwesomeIcon
+                                                    icon={faWallet}
+                                                    color={"green"}
+                                                    size={"lg"}
+                                                />
+                                            </Box>
+                                        ) : (
+                                            <Image
+                                                marginLeft={3}
+                                                boxSize="2rem"
+                                                borderRadius="full"
+                                                mr="12px"
+                                                src={ensAvatar}
+                                            ></Image>
+                                        )}
+                                    </MenuButton>
+                                )}
+                                <WalletButtonMenu copyIcon={copyIcon} setCopyIcon={setCopyIcon} />
                             </Menu>
                         </>
                     ) : (
@@ -198,8 +237,8 @@ export default function WalletButton() {
                         onClick={async () => {
                             console.log("Clicked!")
                             console.log("ensAvatar:", ensAvatar)
+                            console.log("ensAvatarLoading", ensAvatarLoading)
                             console.log("ensName:", ensName)
-                            console.log("width:", width)
                         }}
                         aria-label={"Test button"}
                     ></IconButton> */}
