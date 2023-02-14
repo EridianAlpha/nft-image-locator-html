@@ -25,6 +25,9 @@ import {
     Radio,
     FormHelperText,
     Spacer,
+    Text,
+    HStack,
+    Center,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useContractRead, useProvider } from "wagmi"
@@ -42,13 +45,15 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
     const [radioValue, setRadioValue] = useState("public")
 
     useEffect(() => {
-        console.log("Radio Changed")
-        console.log("customRpcProvider", customRpcProvider)
-
         if (radioValue === "public") {
-            setCustomRpcProvider(null)
+            setCustomRpcProvider("")
         } else if (radioValue === "custom") {
-            setCustomRpcProvider(customRpcProvider?.toString())
+            if (window?.localStorage.getItem("CustomRpcProvider") && !customRpcProvider) {
+                setCustomRpcProvider(window?.localStorage.getItem("CustomRpcProvider"))
+            } else {
+                setCustomRpcProvider(customRpcProvider?.toString())
+                window!.localStorage.setItem("CustomRpcProvider", customRpcProvider?.toString())
+            }
         }
     }, [radioValue, customRpcProvider])
 
@@ -63,30 +68,29 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                         <RadioGroup onChange={setRadioValue} value={radioValue}>
                             <Stack>
                                 <Radio value="public">
-                                    <Badge variant="subtle" fontSize="0.8em" colorScheme="yellow">
+                                    <Badge
+                                        variant="subtle"
+                                        fontSize="0.8em"
+                                        colorScheme="yellow"
+                                        mb={0.5}
+                                    >
                                         Public Provider
                                     </Badge>
                                 </Radio>
-                                <FormControl>
-                                    <Input
-                                        isReadOnly
-                                        sx={{
-                                            ":hover": {
-                                                cursor: "pointer",
-                                            },
-                                        }}
-                                        onClick={() => {
-                                            setRadioValue("public")
-                                        }}
-                                        value={provider.connection.url}
-                                    />
-                                    <FormHelperText>
-                                        This public RPC URL will be used to query the blockchain.
+                                <FormControl mt={0}>
+                                    <FormHelperText mt={0}>
+                                        A public RPC <Code>{provider.connection.url}</Code> will be
+                                        used to query the blockchain.
                                     </FormHelperText>
                                 </FormControl>
                                 <Box pt={8}></Box>
                                 <Radio value="custom">
-                                    <Badge variant="subtle" fontSize="0.8em" colorScheme="blue">
+                                    <Badge
+                                        variant="subtle"
+                                        fontSize="0.8em"
+                                        colorScheme="blue"
+                                        mb={0.5}
+                                    >
                                         Custom Provider
                                     </Badge>
                                 </Radio>
@@ -119,7 +123,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                 colorScheme="blue"
                                 mr={3}
                                 onClick={() => {
-                                    console.log("Secondary Action")
+                                    console.log("Test connection")
                                 }}
                             >
                                 Test Connection
