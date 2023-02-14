@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import AdvancedSettings from "./AdvancedSettingsModal"
 import {
     Box,
     Flex,
@@ -11,14 +12,18 @@ import {
     Code,
     Spinner,
     Image,
+    IconButton,
+    Spacer,
+    useDisclosure,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import ColorModeToggle from "./ColorModeToggle"
+import { faGear } from "@fortawesome/free-solid-svg-icons"
 import { useContractRead } from "wagmi"
 
 export default function NftForm() {
-    const formBackground = useColorModeValue("gray.100", "gray.700")
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
+    const formBackground = useColorModeValue("gray.100", "gray.700")
     const contractAbi = ["function tokenURI(uint256 tokenId) view returns (string)"]
 
     // Retrieve local storage values
@@ -70,86 +75,91 @@ export default function NftForm() {
             })
     }
 
-    // const keydownHandler = (e) => {
-    //     if (e.key === "Enter") {
-    //         console.log("tokenUri", tokenUri)
-    //         fetchUriData()
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     document.addEventListener("keydown", keydownHandler)
-    //     return () => {
-    //         document.removeEventListener("keydown", keydownHandler)
-    //     }
-    // }, [])
-
     return (
-        <Flex alignItems="center" direction="column">
-            <Flex paddingTop={10} alignItems="center" justifyContent="center">
-                <Flex direction="column" background={formBackground} px={16} py={8} rounded={15}>
-                    <Heading mb={6}>Where&apos;s My NFT?</Heading>
-                    <Flex direction="column" minWidth="max-content" alignItems="center" gap="5">
-                        <FormControl>
-                            <FormLabel>Contract Address:</FormLabel>
-                            <Input
-                                placeholder="0x..."
-                                value={contractInput}
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        fetchUriData()
+        <>
+            <Flex alignItems="center" direction="column">
+                <Flex paddingTop={10} alignItems="center" justifyContent="center">
+                    <Flex
+                        direction="column"
+                        background={formBackground}
+                        px={16}
+                        py={8}
+                        rounded={15}
+                    >
+                        <Heading textAlign={"center"} mb={6}>
+                            Where&apos;s My NFT?
+                        </Heading>
+                        <Flex direction="column" minWidth="max-content" alignItems="center" gap="5">
+                            <FormControl>
+                                <FormLabel>Contract Address:</FormLabel>
+                                <Input
+                                    placeholder="0x..."
+                                    value={contractInput}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                            fetchUriData()
+                                        }
+                                    }}
+                                    onInput={(e) =>
+                                        setContractInput((e.target as HTMLInputElement).value)
                                     }
-                                }}
-                                onInput={(e) =>
-                                    setContractInput((e.target as HTMLInputElement).value)
-                                }
-                            ></Input>
-                        </FormControl>
-                        <FormControl>
-                            <FormLabel>Token ID:</FormLabel>
-                            <Input
-                                placeholder="12345"
-                                value={tokenIdInput}
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        fetchUriData()
+                                ></Input>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Token ID:</FormLabel>
+                                <Input
+                                    placeholder="12345"
+                                    value={tokenIdInput}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                            fetchUriData()
+                                        }
+                                    }}
+                                    onInput={(e) =>
+                                        setTokenIdInput((e.target as HTMLInputElement).value)
                                     }
-                                }}
-                                onInput={(e) =>
-                                    setTokenIdInput((e.target as HTMLInputElement).value)
-                                }
-                            ></Input>
-                        </FormControl>
+                                ></Input>
+                            </FormControl>
 
-                        <Button
-                            colorScheme="teal"
-                            onClick={() => {
-                                fetchUriData()
-                                console.log("data", data)
-                                console.log("tokenUriJson", tokenUriJson)
-                            }}
-                        >
-                            {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
-                        </Button>
+                            <Flex minWidth="100%">
+                                <Box width={"40px"} />
+                                <Spacer />
+                                <Button
+                                    colorScheme="teal"
+                                    onClick={() => {
+                                        fetchUriData()
+                                        console.log("data", data)
+                                        console.log("tokenUriJson", tokenUriJson)
+                                    }}
+                                >
+                                    {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
+                                </Button>
+                                <Spacer />
+                                <IconButton onClick={onOpen} aria-label={"Advanced settings"}>
+                                    <FontAwesomeIcon icon={faGear} size={"lg"} />
+                                </IconButton>
+                            </Flex>
+                        </Flex>
                     </Flex>
                 </Flex>
+                {tokenUriJson?.image && (
+                    <Image
+                        mt={5}
+                        borderRadius="full"
+                        boxSize="200px"
+                        alt="NFT Image"
+                        src={tokenUriJson.image}
+                    />
+                )}
+                {tokenUriJson && tokenUriJson !== "Loading" && (
+                    <Box pt={5} pb={20} maxWidth={"90%"} overflow={"scroll"}>
+                        <Code rounded={15} p={5}>
+                            <pre>{JSON.stringify(tokenUriJson, null, 2)}</pre>
+                        </Code>
+                    </Box>
+                )}
             </Flex>
-            {tokenUriJson?.image && (
-                <Image
-                    mt={5}
-                    borderRadius="full"
-                    boxSize="200px"
-                    alt="NFT Image"
-                    src={tokenUriJson.image}
-                />
-            )}
-            {tokenUriJson && tokenUriJson !== "Loading" && (
-                <Box pt={5} pb={20} maxWidth={"90%"} overflow={"scroll"}>
-                    <Code rounded={15} p={5}>
-                        <pre>{JSON.stringify(tokenUriJson, null, 2)}</pre>
-                    </Code>
-                </Box>
-            )}
-        </Flex>
+            <AdvancedSettings isOpen={isOpen} closeModal={onClose} />
+        </>
     )
 }

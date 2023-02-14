@@ -2,6 +2,7 @@
 
 import { createContext } from "react"
 
+// Set Theme Context
 type ThemeContextType = {
     theme: string
     setTheme: React.Dispatch<React.SetStateAction<string>>
@@ -11,6 +12,7 @@ const ThemeContext = createContext<ThemeContextType>({
     setTheme: () => {},
 })
 
+// Set Wallet Connected Context
 type WalletContextType = {
     walletConnected: boolean
     setWalletConnected: React.Dispatch<React.SetStateAction<boolean>>
@@ -20,4 +22,14 @@ const WalletConnectedContext = createContext<WalletContextType>({
     setWalletConnected: () => {},
 })
 
-export { ThemeContext, WalletConnectedContext }
+// Set Custom RPC Provider Context
+type CustomRpcProviderContextContextType = {
+    customRpcProvider: boolean
+    setCustomRpcProvider: React.Dispatch<React.SetStateAction<string>>
+}
+const CustomRpcProviderContext = createContext<CustomRpcProviderContextContextType>({
+    customRpcProvider: false,
+    setCustomRpcProvider: () => {},
+})
+
+export { ThemeContext, WalletConnectedContext, CustomRpcProviderContext }

@@ -2,7 +2,7 @@ import type { AppProps } from "next/app"
 import { useState, useEffect } from "react"
 import "../styles/globals.css"
 
-import { ThemeContext, WalletConnectedContext } from "../utils/context"
+import { ThemeContext, WalletConnectedContext, CustomRpcProviderContext } from "../utils/context"
 
 import { ChakraProvider } from "@chakra-ui/react"
 import { WagmiConfig, createClient, configureChains, mainnet, goerli } from "wagmi"
@@ -31,6 +31,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     // exists, the state is set to true (in WalletButton.tsx)
     const [walletConnected, setWalletConnected] = useState(false)
 
+    // Allow the user to input their own RPC URLs
+    // Initially, I won't store it in local storage so it will
+    // just be per session, but I'll add that later
+    const [customRpcProvider, setCustomRpcProvider] = useState<any>()
+
     // Create Wagmi client
     const { chains, provider } = configureChains(
         [mainnet, goerli],
@@ -47,9 +52,29 @@ function MyApp({ Component, pageProps }: AppProps) {
             //                 : process.env.NEXT_PUBLIC_GOERLI_RPC_URL,
             //     }),
             // }),
-            publicProvider(),
+            // ****
+            // customRpcProvider
+            //     ? jsonRpcProvider({
+            //           priority: 0,
+            //           rpc: (chain) => ({
+            //               http:
+            //                   chain.id === 1 ? customRpcProvider.mainnet : customRpcProvider.goerli,
+            //           }),
+            //       })
+            //     : publicProvider(),
+            // ****
+            customRpcProvider
+                ? jsonRpcProvider({
+                      priority: 0,
+                      rpc: () => ({
+                          http: customRpcProvider,
+                      }),
+                  })
+                : publicProvider(),
+            // publicProvider(),
         ]
     )
+
     const { connectors } = getDefaultWallets({
         appName: "NFT Image Locator App",
         chains,
@@ -76,14 +101,18 @@ function MyApp({ Component, pageProps }: AppProps) {
         <ChakraProvider>
             <ThemeContext.Provider value={{ theme, setTheme }}>
                 <WalletConnectedContext.Provider value={{ walletConnected, setWalletConnected }}>
-                    <WagmiConfig client={wagmiClient}>
-                        <RainbowKitProvider
-                            theme={theme == "darkTheme" ? darkTheme() : lightTheme()}
-                            chains={chains}
-                        >
-                            <Component {...pageProps} />
-                        </RainbowKitProvider>
-                    </WagmiConfig>
+                    <CustomRpcProviderContext.Provider
+                        value={{ customRpcProvider, setCustomRpcProvider }}
+                    >
+                        <WagmiConfig client={wagmiClient}>
+                            <RainbowKitProvider
+                                theme={theme == "darkTheme" ? darkTheme() : lightTheme()}
+                                chains={chains}
+                            >
+                                <Component {...pageProps} />
+                            </RainbowKitProvider>
+                        </WagmiConfig>
+                    </CustomRpcProviderContext.Provider>
                 </WalletConnectedContext.Provider>
             </ThemeContext.Provider>
         </ChakraProvider>
