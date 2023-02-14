@@ -10,6 +10,7 @@ import {
     FormLabel,
     Code,
     Spinner,
+    Image,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import ColorModeToggle from "./ColorModeToggle"
@@ -133,6 +134,15 @@ export default function NftForm() {
                     </Flex>
                 </Flex>
             </Flex>
+            {tokenUriJson?.image && (
+                <Image
+                    mt={5}
+                    borderRadius="full"
+                    boxSize="200px"
+                    alt="NFT Image"
+                    src={tokenUriJson.image}
+                />
+            )}
             {tokenUriJson && tokenUriJson !== "Loading" && (
                 <Box pt={5} pb={20} maxWidth={"90%"} overflow={"scroll"}>
                     <Code rounded={15} p={5}>
