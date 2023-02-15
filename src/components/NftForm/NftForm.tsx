@@ -81,13 +81,10 @@ export default function NftForm() {
     async function findNFt() {
         setTokenUriJson("Loading")
         const blockNumberResponse = await testRpcConnection()
-        console.log("blockNumberResponse", blockNumberResponse)
         setTokenUriJson("Loading")
 
         if (blockNumberResponse.isSuccess) {
             const response = await contractDataRefetch()
-            console.log("response:", response)
-
             if (response.isSuccess) {
                 setContractData(response.data)
                 setTokenUri(response.data)
@@ -105,7 +102,6 @@ export default function NftForm() {
         setBlockNumberRefetchResponse("Loading")
         const response = await blockNumberRefetch()
         setBlockNumberRefetchResponse(response)
-        console.log("response.isSuccess", response.isSuccess)
 
         response.isSuccess ? setTokenUriJson("") : setTokenUriJson("RPC Error")
         return response
@@ -226,6 +222,8 @@ export default function NftForm() {
                 testRpcConnection={testRpcConnection}
                 blockNumberRefetchResponse={blockNumberRefetchResponse}
                 setBlockNumberRefetchResponse={setBlockNumberRefetchResponse}
+                setTokenUriJson={setTokenUriJson}
+                tokenUriJson={tokenUriJson}
             />
         </>
     )

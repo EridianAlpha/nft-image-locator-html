@@ -1,11 +1,11 @@
 import WalletButtonMenu from "./WalletButtonMenu"
 
 import React, { useEffect, useState, useContext } from "react"
-import { toHex, truncateAddress } from "../utils/utils"
+import { toHex, truncateAddress } from "../../utils/utils"
 
-import { WalletConnectedContext } from "../utils/context"
+import { WalletConnectedContext } from "../../utils/context"
 
-import ClientOnly from "./ClientOnly"
+import ClientOnly from "../ClientOnly"
 
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName, useProvider, useNetwork } from "wagmi"
 

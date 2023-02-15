@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from "react"
 import TestConnectionButton from "./TestConnectionButton"
 
-import { CustomRpcProviderContext } from "../utils/context"
+import NextLink from "next/link"
+import { CustomRpcProviderContext } from "../../utils/context"
 import {
     Box,
     Flex,
@@ -22,7 +23,12 @@ import {
     Radio,
     FormHelperText,
     Spacer,
+    Link,
+    Text,
 } from "@chakra-ui/react"
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faExternalLink, faFaceFrown, faFaceSmile } from "@fortawesome/free-solid-svg-icons"
 
 import { useProvider, useBlockNumber } from "wagmi"
 
@@ -32,6 +38,8 @@ export type AdvancedSettingsModalProps = {
     testRpcConnection: () => void
     blockNumberRefetchResponse: any
     setBlockNumberRefetchResponse: (response: any) => void
+    setTokenUriJson: (response: any) => void
+    tokenUriJson: any
 }
 
 export default function AdvancedSettingsModal({
@@ -40,6 +48,8 @@ export default function AdvancedSettingsModal({
     testRpcConnection,
     blockNumberRefetchResponse,
     setBlockNumberRefetchResponse,
+    setTokenUriJson,
+    tokenUriJson,
 }: AdvancedSettingsModalProps) {
     const isSSR = typeof window === "undefined"
     const provider = useProvider<any>()
@@ -86,6 +96,11 @@ export default function AdvancedSettingsModal({
                 isOpen={isOpen}
                 onClose={() => {
                     closeModal()
+                    // Test on close any warnings are removed if the connection was fixed
+                    if (tokenUriJson == "RPC Error") {
+                        setTokenUriJson("Loading")
+                        testRpcConnection()
+                    }
                     setBlockNumberRefetchResponse(null)
                     !customRpcProvider ? setRadioValue("public") : null
                 }}
@@ -104,12 +119,14 @@ export default function AdvancedSettingsModal({
                                         colorScheme="yellow"
                                         mb={0.5}
                                     >
-                                        Public Provider
-                                    </Badge>
+                                        Public Provider (Automatic)
+                                    </Badge>{" "}
+                                    "Trust, don't verify" <FontAwesomeIcon icon={faFaceFrown} />
                                 </Radio>
                                 <FormControl pl={6} mt={0}>
                                     <FormHelperText mt={0}>
-                                        A public RPC will be used to query the blockchain.
+                                        A public RPC will be automatically selected and used to
+                                        query the blockchain.
                                     </FormHelperText>
                                 </FormControl>
                                 <Box pt={6}></Box>
@@ -120,8 +137,9 @@ export default function AdvancedSettingsModal({
                                         colorScheme="blue"
                                         mb={0.5}
                                     >
-                                        Custom Provider
-                                    </Badge>
+                                        Custom Provider (Manual)
+                                    </Badge>{" "}
+                                    "Verify, don't trust" <FontAwesomeIcon icon={faFaceSmile} />
                                 </Radio>
                                 <FormControl pl={6}>
                                     <Input
@@ -132,9 +150,31 @@ export default function AdvancedSettingsModal({
                                         placeholder="https://"
                                         onChange={(e) => customProviderInputChange(e)}
                                         value={customRpcProvider?.toString()}
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter") {
+                                                if (radioValue === "custom" && !customRpcProvider) {
+                                                    return
+                                                } else {
+                                                    testRpcConnection()
+                                                }
+                                            }
+                                        }}
                                     />
                                     <FormHelperText>
-                                        Enter an RPC that will be used to query the blockchain.
+                                        Specify an RPC that will be used to query the blockchain.
+                                        <br />
+                                        For example:
+                                        <br />- A local node e.g. <Code>localhost:8545</Code>
+                                        <br /> - Select from{" "}
+                                        <Link
+                                            textDecoration={"underline"}
+                                            as={NextLink}
+                                            href="https://ethereumnodes.com/"
+                                            isExternal
+                                        >
+                                            public RPC providers{" "}
+                                            <FontAwesomeIcon icon={faExternalLink} size={"sm"} />
+                                        </Link>
                                     </FormHelperText>
                                 </FormControl>
                             </Stack>

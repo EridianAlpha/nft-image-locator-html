@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
-import { truncateAddress } from "../utils/utils"
+import { truncateAddress } from "../../utils/utils"
 
-import { WalletConnectedContext } from "../utils/context"
+import { WalletConnectedContext } from "../../utils/context"
 
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName, useProvider, useNetwork } from "wagmi"
 

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react"
-import { ThemeContext } from "../utils/context"
+import { ThemeContext } from "../../utils/context"
 
 import { Button, ButtonProps, Flex, useColorMode } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
