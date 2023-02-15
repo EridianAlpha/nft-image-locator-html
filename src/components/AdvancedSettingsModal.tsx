@@ -42,20 +42,36 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
 
     const { customRpcProvider, setCustomRpcProvider } = useContext(CustomRpcProviderContext)
 
-    const [radioValue, setRadioValue] = useState("public")
+    const isSSR = typeof window === "undefined"
+    const [radioValue, setRadioValue] = useState(
+        !isSSR && window?.localStorage.getItem("CustomRpcProvider") ? "custom" : "public"
+    )
 
     useEffect(() => {
         if (radioValue === "public") {
             setCustomRpcProvider("")
+            window?.localStorage.removeItem("CustomRpcProvider")
         } else if (radioValue === "custom") {
             if (window?.localStorage.getItem("CustomRpcProvider") && !customRpcProvider) {
                 setCustomRpcProvider(window?.localStorage.getItem("CustomRpcProvider"))
-            } else {
-                setCustomRpcProvider(customRpcProvider?.toString())
-                window!.localStorage.setItem("CustomRpcProvider", customRpcProvider?.toString())
             }
         }
-    }, [radioValue, customRpcProvider])
+    }, [radioValue])
+
+    useEffect(() => {
+        if (radioValue === "custom" && customRpcProvider) {
+            window?.localStorage.setItem("CustomRpcProvider", customRpcProvider?.toString())
+        }
+    }, [customRpcProvider])
+
+    function customProviderInputChange(e) {
+        if ((e.target as HTMLInputElement).value) {
+            setCustomRpcProvider((e.target as HTMLInputElement).value)
+        } else {
+            setCustomRpcProvider("")
+            window?.localStorage.removeItem("CustomRpcProvider")
+        }
+    }
 
     return (
         <>
@@ -101,16 +117,11 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                             setRadioValue("custom")
                                         }}
                                         placeholder="https://"
-                                        onInput={(e) =>
-                                            setCustomRpcProvider(
-                                                (e.target as HTMLInputElement).value
-                                            )
-                                        }
+                                        onChange={(e) => customProviderInputChange(e)}
                                         value={customRpcProvider?.toString()}
                                     />
                                     <FormHelperText>
-                                        Enter a custom RPC URL that will be used to query the
-                                        blockchain.
+                                        Enter an RPC URL that will be used to query the blockchain.
                                     </FormHelperText>
                                 </FormControl>
                             </Stack>
