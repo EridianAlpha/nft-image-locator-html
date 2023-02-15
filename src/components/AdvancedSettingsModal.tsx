@@ -5,15 +5,10 @@ import { CustomRpcProviderContext } from "../utils/context"
 import {
     Box,
     Flex,
-    Heading,
     Input,
-    useColorModeValue,
     Button,
     FormControl,
-    FormLabel,
     Code,
-    Spinner,
-    Image,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -27,14 +22,9 @@ import {
     Radio,
     FormHelperText,
     Spacer,
-    Text,
-    HStack,
-    Center,
 } from "@chakra-ui/react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCircleCheck } from "@fortawesome/free-solid-svg-icons"
 
-import { useContractRead, useProvider, useBlockNumber } from "wagmi"
+import { useProvider, useBlockNumber } from "wagmi"
 
 export type AdvancedSettingsModalProps = {
     isOpen: boolean
@@ -42,21 +32,21 @@ export type AdvancedSettingsModalProps = {
 }
 
 export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSettingsModalProps) {
+    const isSSR = typeof window === "undefined"
     const provider = useProvider<any>()
 
+    // Use refetch to manually test the connection
+    const { refetch: blockNumberRefetch } = useBlockNumber()
+
+    // This variable uses context because it's used in the top level render of the app
     const { customRpcProvider, setCustomRpcProvider } = useContext(CustomRpcProviderContext)
 
-    const {
-        data: blockNumber,
-        isError: blockNumberError,
-        isLoading: blockNumberLoading,
-        refetch: blockNumberRefetch,
-    } = useBlockNumber()
-
-    const isSSR = typeof window === "undefined"
+    // Set radio button on open
     const [radioValue, setRadioValue] = useState(
         !isSSR && window?.localStorage.getItem("CustomRpcProvider") ? "custom" : "public"
     )
+
+    // State used for connection testing
     const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
 
     useEffect(() => {
@@ -68,6 +58,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                 setCustomRpcProvider(window?.localStorage.getItem("CustomRpcProvider"))
             }
         }
+        setBlockNumberRefetchResponse(null)
     }, [radioValue])
 
     useEffect(() => {
@@ -85,11 +76,24 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
         }
     }
 
+    async function testRpcConnection() {
+        setBlockNumberRefetchResponse("Loading")
+        const response = await blockNumberRefetch()
+        setBlockNumberRefetchResponse(response)
+    }
+
     return (
         <>
-            <Modal isOpen={isOpen} onClose={closeModal} isCentered>
+            <Modal
+                size={"lg"}
+                isOpen={isOpen}
+                onClose={() => {
+                    closeModal()
+                    setBlockNumberRefetchResponse(null)
+                }}
+            >
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent mt={100}>
                     <ModalHeader>Select RPC Provider</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
@@ -105,13 +109,12 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                         Public Provider
                                     </Badge>
                                 </Radio>
-                                <FormControl mt={0}>
+                                <FormControl pl={6} mt={0}>
                                     <FormHelperText mt={0}>
-                                        A public RPC <Code>{provider.connection.url}</Code> will be
-                                        used to query the blockchain.
+                                        A public RPC will be used to query the blockchain.
                                     </FormHelperText>
                                 </FormControl>
-                                <Box pt={8}></Box>
+                                <Box pt={6}></Box>
                                 <Radio value="custom">
                                     <Badge
                                         variant="subtle"
@@ -122,7 +125,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                         Custom Provider
                                     </Badge>
                                 </Radio>
-                                <FormControl>
+                                <FormControl pl={6}>
                                     <Input
                                         type={"url"}
                                         onFocus={() => {
@@ -133,28 +136,78 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                         value={customRpcProvider?.toString()}
                                     />
                                     <FormHelperText>
-                                        Enter an RPC URL that will be used to query the blockchain.
+                                        Enter an RPC that will be used to query the blockchain.
                                     </FormHelperText>
                                 </FormControl>
                             </Stack>
                         </RadioGroup>
                     </ModalBody>
-                    <ModalFooter>
-                        <Flex>
+                    <ModalFooter alignItems={"flex-start"}>
+                        {blockNumberRefetchResponse?.failureReason ? (
+                            <Box>
+                                <FormControl mt={0} pr={3}>
+                                    <FormHelperText mt={0} wordBreak={"break-word"}>
+                                        {blockNumberRefetchResponse?.failureReason.code ? (
+                                            <>
+                                                <Badge
+                                                    variant="subtle"
+                                                    fontSize="0.8em"
+                                                    colorScheme="red"
+                                                >
+                                                    {blockNumberRefetchResponse?.failureReason.code}{" "}
+                                                    {
+                                                        blockNumberRefetchResponse?.failureReason
+                                                            .status
+                                                    }
+                                                </Badge>
+                                                <br />
+                                                {/* <br /> */}
+                                            </>
+                                        ) : null}
+
+                                        {blockNumberRefetchResponse?.failureReason.serverError
+                                            ?.message ? (
+                                            <>
+                                                <br />
+                                                {
+                                                    blockNumberRefetchResponse?.failureReason
+                                                        .serverError?.message
+                                                }
+                                                <br />
+                                            </>
+                                        ) : null}
+                                        <br />
+                                        <Code>{blockNumberRefetchResponse?.failureReason.url}</Code>
+                                    </FormHelperText>
+                                </FormControl>
+                            </Box>
+                        ) : null}
+                        {blockNumberRefetchResponse?.status == "success" ? (
+                            <Box>
+                                <FormControl mt={0} pr={3}>
+                                    <FormHelperText mt={0} wordBreak={"break-word"}>
+                                        Current block number:
+                                        {"\n"}
+                                        <Code>{blockNumberRefetchResponse?.data}</Code>
+                                    </FormHelperText>
+                                </FormControl>
+                            </Box>
+                        ) : null}
+                        <Spacer />
+                        <Box>
                             <Button
-                                colorScheme="blue"
-                                mr={3}
+                                isDisabled={
+                                    radioValue === "custom" &&
+                                    (!customRpcProvider || blockNumberRefetchResponse == "Loading")
+                                        ? true
+                                        : false
+                                }
+                                colorScheme={blockNumberRefetchResponse?.isError ? "red" : "blue"}
                                 onClick={async () => {
-                                    //TODO clean this up so it shows a better error (or ideally the button is disabled) when there's no input in the custom provider input
                                     if (radioValue === "custom" && !customRpcProvider) {
                                         return
                                     } else {
-                                        setBlockNumberRefetchResponse("Loading")
-                                        const response = await blockNumberRefetch()
-                                        setBlockNumberRefetchResponse(response)
-                                        setTimeout(function () {
-                                            setBlockNumberRefetchResponse(null)
-                                        }, 3_000)
+                                        testRpcConnection()
                                     }
                                 }}
                             >
@@ -162,7 +215,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                                     blockNumberRefetchResponse={blockNumberRefetchResponse}
                                 />
                             </Button>
-                        </Flex>
+                        </Box>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

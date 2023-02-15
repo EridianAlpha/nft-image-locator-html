@@ -1,10 +1,10 @@
-import { Spinner, Text } from "@chakra-ui/react"
+import { Spinner, Text, FormControl, FormHelperText } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons"
 
 export default function TestConnectionButton({ blockNumberRefetchResponse }) {
     if (!blockNumberRefetchResponse) {
-        return <Text>Test Connection</Text>
+        return <Text>Test connection</Text>
     } else if (blockNumberRefetchResponse === "Loading") {
         return (
             <>
@@ -22,7 +22,7 @@ export default function TestConnectionButton({ blockNumberRefetchResponse }) {
     } else if (blockNumberRefetchResponse.isError) {
         return (
             <>
-                <Text color="red.500">Connection failed</Text>
+                <Text>Connection failed</Text>
             </>
         )
     }

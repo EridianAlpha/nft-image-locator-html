@@ -21,6 +21,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css"
 config.autoAddCss = false
 
 function MyApp({ Component, pageProps }: AppProps) {
+    const isSSR = typeof window === "undefined"
+
     // Use this theme variable, which is set at the same time as
     // the Chakra theme variable (in ColorModeToggle.tsx) to set
     // the Rainbow theme and any other theme variables in the future
@@ -34,7 +36,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     // Allow the user to input their own RPC URLs
     // Initially, I won't store it in local storage so it will
     // just be per session, but I'll add that later
-    const [customRpcProvider, setCustomRpcProvider] = useState<any>()
+    const [customRpcProvider, setCustomRpcProvider] = useState<any>(
+        !isSSR && window?.localStorage.getItem("CustomRpcProvider")
+            ? window.localStorage.getItem("CustomRpcProvider")
+            : null
+    )
 
     // Create Wagmi client
     const { chains, provider } = configureChains(

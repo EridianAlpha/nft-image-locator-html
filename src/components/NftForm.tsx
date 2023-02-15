@@ -40,8 +40,9 @@ export default function NftForm() {
     const [tokenIdInput, setTokenIdInput] = useState<any>(localTokenIdInput || "")
     const [tokenUri, setTokenUri] = useState<any>()
     const [tokenUriJson, setTokenUriJson] = useState<any>()
+    const [contractData, setContractData] = useState<any>()
 
-    const { data, isError, isLoading } = useContractRead({
+    const { refetch: contractDataRefetch } = useContractRead({
         address: contractInput,
         abi: contractAbi,
         functionName: "tokenURI",
@@ -55,13 +56,9 @@ export default function NftForm() {
         }
     }, [contractInput, tokenIdInput])
 
-    useEffect(() => {
-        setTokenUri(data)
-    }, [data])
-
-    async function fetchUriData() {
+    async function fetchUriData(_tokenUri: any) {
         setTokenUriJson("Loading")
-        await fetch(tokenUri)
+        await fetch(_tokenUri)
             .then(async (response) => {
                 if (!response.ok) {
                     setTokenUriJson(response.statusText)
@@ -73,6 +70,22 @@ export default function NftForm() {
             .catch((error) => {
                 console.log("error: " + error)
             })
+    }
+
+    async function findNFt() {
+        const response = await contractDataRefetch()
+        console.log("response:", response)
+
+        // Test the connection here to check it works before trying to get the contract data
+
+        if (response.isSuccess) {
+            setContractData(response.data)
+            setTokenUri(response.data)
+            fetchUriData(response.data)
+        } else {
+            setContractData(null)
+            setTokenUriJson("NFT Not Found")
+        }
     }
 
     return (
@@ -97,7 +110,7 @@ export default function NftForm() {
                                     value={contractInput}
                                     onKeyPress={(e) => {
                                         if (e.key === "Enter") {
-                                            fetchUriData()
+                                            findNFt()
                                         }
                                     }}
                                     onInput={(e) =>
@@ -112,7 +125,7 @@ export default function NftForm() {
                                     value={tokenIdInput}
                                     onKeyPress={(e) => {
                                         if (e.key === "Enter") {
-                                            fetchUriData()
+                                            findNFt()
                                         }
                                     }}
                                     onInput={(e) =>
@@ -125,11 +138,13 @@ export default function NftForm() {
                                 <Box width={"40px"} />
                                 <Spacer />
                                 <Button
+                                    isDisabled={tokenUriJson == "Loading" ? true : false}
                                     colorScheme="teal"
                                     onClick={() => {
-                                        fetchUriData()
-                                        console.log("data", data)
-                                        console.log("tokenUriJson", tokenUriJson)
+                                        findNFt()
+                                        // fetchUriData()
+                                        // console.log("contractData", contractData)
+                                        // console.log("tokenUriJson", tokenUriJson)
                                     }}
                                 >
                                     {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
