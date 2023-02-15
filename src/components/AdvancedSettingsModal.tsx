@@ -1,4 +1,6 @@
 import { useState, useEffect, useContext } from "react"
+import TestConnectionButton from "./TestConnectionButton"
+
 import { CustomRpcProviderContext } from "../utils/context"
 import {
     Box,
@@ -30,7 +32,9 @@ import {
     Center,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useContractRead, useProvider } from "wagmi"
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons"
+
+import { useContractRead, useProvider, useBlockNumber } from "wagmi"
 
 export type AdvancedSettingsModalProps = {
     isOpen: boolean
@@ -42,10 +46,18 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
 
     const { customRpcProvider, setCustomRpcProvider } = useContext(CustomRpcProviderContext)
 
+    const {
+        data: blockNumber,
+        isError: blockNumberError,
+        isLoading: blockNumberLoading,
+        refetch: blockNumberRefetch,
+    } = useBlockNumber()
+
     const isSSR = typeof window === "undefined"
     const [radioValue, setRadioValue] = useState(
         !isSSR && window?.localStorage.getItem("CustomRpcProvider") ? "custom" : "public"
     )
+    const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
 
     useEffect(() => {
         if (radioValue === "public") {
@@ -127,17 +139,28 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                             </Stack>
                         </RadioGroup>
                     </ModalBody>
-
                     <ModalFooter>
                         <Flex>
                             <Button
                                 colorScheme="blue"
                                 mr={3}
-                                onClick={() => {
-                                    console.log("Test connection")
+                                onClick={async () => {
+                                    //TODO clean this up so it shows a better error (or ideally the button is disabled) when there's no input in the custom provider input
+                                    if (radioValue === "custom" && !customRpcProvider) {
+                                        return
+                                    } else {
+                                        setBlockNumberRefetchResponse("Loading")
+                                        const response = await blockNumberRefetch()
+                                        setBlockNumberRefetchResponse(response)
+                                        setTimeout(function () {
+                                            setBlockNumberRefetchResponse(null)
+                                        }, 3_000)
+                                    }
                                 }}
                             >
-                                Test Connection
+                                <TestConnectionButton
+                                    blockNumberRefetchResponse={blockNumberRefetchResponse}
+                                />
                             </Button>
                         </Flex>
                     </ModalFooter>
