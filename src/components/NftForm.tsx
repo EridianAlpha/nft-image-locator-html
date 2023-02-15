@@ -15,13 +15,17 @@ import {
     IconButton,
     Spacer,
     useDisclosure,
+    Tooltip,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faGear } from "@fortawesome/free-solid-svg-icons"
-import { useContractRead } from "wagmi"
+import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
+import { useContractRead, useBlockNumber } from "wagmi"
 
 export default function NftForm() {
     const { isOpen, onOpen, onClose } = useDisclosure()
+
+    // Use refetch to manually test the connection
+    const { refetch: blockNumberRefetch } = useBlockNumber()
 
     const formBackground = useColorModeValue("gray.100", "gray.700")
     const contractAbi = ["function tokenURI(uint256 tokenId) view returns (string)"]
@@ -42,6 +46,9 @@ export default function NftForm() {
     const [tokenUriJson, setTokenUriJson] = useState<any>()
     const [contractData, setContractData] = useState<any>()
 
+    // State used for connection testing
+    const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
+
     const { refetch: contractDataRefetch } = useContractRead({
         address: contractInput,
         abi: contractAbi,
@@ -57,7 +64,6 @@ export default function NftForm() {
     }, [contractInput, tokenIdInput])
 
     async function fetchUriData(_tokenUri: any) {
-        setTokenUriJson("Loading")
         await fetch(_tokenUri)
             .then(async (response) => {
                 if (!response.ok) {
@@ -73,19 +79,36 @@ export default function NftForm() {
     }
 
     async function findNFt() {
-        const response = await contractDataRefetch()
-        console.log("response:", response)
+        setTokenUriJson("Loading")
+        const blockNumberResponse = await testRpcConnection()
+        console.log("blockNumberResponse", blockNumberResponse)
+        setTokenUriJson("Loading")
 
-        // Test the connection here to check it works before trying to get the contract data
+        if (blockNumberResponse.isSuccess) {
+            const response = await contractDataRefetch()
+            console.log("response:", response)
 
-        if (response.isSuccess) {
-            setContractData(response.data)
-            setTokenUri(response.data)
-            fetchUriData(response.data)
+            if (response.isSuccess) {
+                setContractData(response.data)
+                setTokenUri(response.data)
+                fetchUriData(response.data)
+            } else {
+                setContractData(null)
+                setTokenUriJson("NFT Not Found")
+            }
         } else {
-            setContractData(null)
-            setTokenUriJson("NFT Not Found")
+            setTokenUriJson("RPC Error")
         }
+    }
+
+    async function testRpcConnection() {
+        setBlockNumberRefetchResponse("Loading")
+        const response = await blockNumberRefetch()
+        setBlockNumberRefetchResponse(response)
+        console.log("response.isSuccess", response.isSuccess)
+
+        response.isSuccess ? setTokenUriJson("") : setTokenUriJson("RPC Error")
+        return response
     }
 
     return (
@@ -142,17 +165,40 @@ export default function NftForm() {
                                     colorScheme="teal"
                                     onClick={() => {
                                         findNFt()
-                                        // fetchUriData()
-                                        // console.log("contractData", contractData)
-                                        // console.log("tokenUriJson", tokenUriJson)
                                     }}
                                 >
                                     {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
                                 </Button>
                                 <Spacer />
-                                <IconButton onClick={onOpen} aria-label={"Advanced settings"}>
-                                    <FontAwesomeIcon icon={faGear} size={"lg"} />
-                                </IconButton>
+                                <Tooltip
+                                    hasArrow
+                                    openDelay={300}
+                                    placement="bottom"
+                                    label="Select RPC Provider"
+                                >
+                                    <IconButton
+                                        //Stops the tooltip opening when modal closes
+                                        onFocus={(e) => e.preventDefault()}
+                                        onClick={() => {
+                                            onOpen()
+                                            // If there's an RPC error, don't clear the tokenUriJson so the error is visible when the modal opens
+                                            if (tokenUriJson != "RPC Error") {
+                                                setBlockNumberRefetchResponse("")
+                                            }
+                                        }}
+                                        aria-label={"Advanced settings"}
+                                    >
+                                        {tokenUriJson == "RPC Error" ? (
+                                            <FontAwesomeIcon
+                                                color="red"
+                                                icon={faWarning}
+                                                size={"lg"}
+                                            />
+                                        ) : (
+                                            <FontAwesomeIcon icon={faGear} size={"lg"} />
+                                        )}
+                                    </IconButton>
+                                </Tooltip>
                             </Flex>
                         </Flex>
                     </Flex>
@@ -174,7 +220,13 @@ export default function NftForm() {
                     </Box>
                 )}
             </Flex>
-            <AdvancedSettings isOpen={isOpen} closeModal={onClose} />
+            <AdvancedSettings
+                isOpen={isOpen}
+                closeModal={onClose}
+                testRpcConnection={testRpcConnection}
+                blockNumberRefetchResponse={blockNumberRefetchResponse}
+                setBlockNumberRefetchResponse={setBlockNumberRefetchResponse}
+            />
         </>
     )
 }

@@ -29,14 +29,20 @@ import { useProvider, useBlockNumber } from "wagmi"
 export type AdvancedSettingsModalProps = {
     isOpen: boolean
     closeModal: () => void
+    testRpcConnection: () => void
+    blockNumberRefetchResponse: any
+    setBlockNumberRefetchResponse: (response: any) => void
 }
 
-export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSettingsModalProps) {
+export default function AdvancedSettingsModal({
+    isOpen,
+    closeModal,
+    testRpcConnection,
+    blockNumberRefetchResponse,
+    setBlockNumberRefetchResponse,
+}: AdvancedSettingsModalProps) {
     const isSSR = typeof window === "undefined"
     const provider = useProvider<any>()
-
-    // Use refetch to manually test the connection
-    const { refetch: blockNumberRefetch } = useBlockNumber()
 
     // This variable uses context because it's used in the top level render of the app
     const { customRpcProvider, setCustomRpcProvider } = useContext(CustomRpcProviderContext)
@@ -45,9 +51,6 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
     const [radioValue, setRadioValue] = useState(
         !isSSR && window?.localStorage.getItem("CustomRpcProvider") ? "custom" : "public"
     )
-
-    // State used for connection testing
-    const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
 
     useEffect(() => {
         if (radioValue === "public") {
@@ -76,12 +79,6 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
         }
     }
 
-    async function testRpcConnection() {
-        setBlockNumberRefetchResponse("Loading")
-        const response = await blockNumberRefetch()
-        setBlockNumberRefetchResponse(response)
-    }
-
     return (
         <>
             <Modal
@@ -90,6 +87,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                 onClose={() => {
                     closeModal()
                     setBlockNumberRefetchResponse(null)
+                    !customRpcProvider ? setRadioValue("public") : null
                 }}
             >
                 <ModalOverlay />
@@ -184,7 +182,7 @@ export default function AdvancedSettingsModal({ isOpen, closeModal }: AdvancedSe
                         ) : null}
                         {blockNumberRefetchResponse?.status == "success" ? (
                             <Box>
-                                <FormControl mt={0} pr={3}>
+                                <FormControl pl={6} mt={0} pr={3}>
                                     <FormHelperText mt={0} wordBreak={"break-word"}>
                                         Current block number:
                                         {"\n"}

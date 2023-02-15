@@ -46,29 +46,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     const { chains, provider } = configureChains(
         [mainnet, goerli],
         [
-            // TODO: Doesn't work with basic auth in the RPC URL
-            // https://github.com/wagmi-dev/wagmi/discussions/1847
-            // *** Uncomment to use your own RPC URLs ***
-            // jsonRpcProvider({
-            //     priority: 0,
-            //     rpc: (chain) => ({
-            //         http:
-            //             chain.id === 1
-            //                 ? process.env.NEXT_PUBLIC_MAINNET_RPC_URL
-            //                 : process.env.NEXT_PUBLIC_GOERLI_RPC_URL,
-            //     }),
-            // }),
-            // ****
-            // customRpcProvider
-            //     ? jsonRpcProvider({
-            //           priority: 0,
-            //           rpc: (chain) => ({
-            //               http:
-            //                   chain.id === 1 ? customRpcProvider.mainnet : customRpcProvider.goerli,
-            //           }),
-            //       })
-            //     : publicProvider(),
-            // ****
             customRpcProvider
                 ? jsonRpcProvider({
                       priority: 0,
@@ -77,7 +54,6 @@ function MyApp({ Component, pageProps }: AppProps) {
                       }),
                   })
                 : publicProvider(),
-            // publicProvider(),
         ]
     )
 
