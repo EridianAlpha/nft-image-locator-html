@@ -75,6 +75,24 @@ export default function NftForm() {
             })
             .catch((error) => {
                 console.log("error: " + error)
+                console.log("Trying through CORS proxy...")
+                fetchUriDataProxy(_tokenUri)
+            })
+    }
+
+    async function fetchUriDataProxy(_tokenUri: any) {
+        await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(_tokenUri)}`)
+            .then(async (response) => {
+                if (!response.ok) {
+                    setTokenUriJson(response.statusText)
+                    throw new Error(response.statusText)
+                } else {
+                    const data = await response.json()
+                    setTokenUriJson(JSON.parse(data.contents))
+                }
+            })
+            .catch((error) => {
+                console.log("error: " + error)
             })
     }
 
