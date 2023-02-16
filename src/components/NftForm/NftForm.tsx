@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import got from "got"
 import AdvancedSettings from "./AdvancedSettingsModal"
 import {
     Box,
@@ -88,7 +89,14 @@ export default function NftForm() {
                     throw new Error(response.statusText)
                 } else {
                     const data = await response.json()
-                    setTokenUriJson(JSON.parse(data.contents))
+                    // If data is a binary response, convert it to json
+                    if (data.contents.startsWith("data:binary/octet-stream;base64")) {
+                        const base64 = data.contents.split(",")[1]
+                        const string = Buffer.from(base64, "base64").toString("utf8")
+                        setTokenUriJson(JSON.parse(string))
+                    } else {
+                        setTokenUriJson(JSON.parse(data.contents))
+                    }
                 }
             })
             .catch((error) => {
