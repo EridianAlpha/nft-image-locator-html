@@ -121,7 +121,8 @@ export default function AdvancedSettingsModal({
                                     >
                                         Public Provider (Automatic)
                                     </Badge>{" "}
-                                    "Trust, don't verify" <FontAwesomeIcon icon={faFaceFrown} />
+                                    &quot;Trust, don&apos;t verify&quot;{" "}
+                                    <FontAwesomeIcon icon={faFaceFrown} />
                                 </Radio>
                                 <FormControl pl={6} mt={0}>
                                     <FormHelperText mt={0}>
@@ -139,7 +140,8 @@ export default function AdvancedSettingsModal({
                                     >
                                         Custom Provider (Manual)
                                     </Badge>{" "}
-                                    "Verify, don't trust" <FontAwesomeIcon icon={faFaceSmile} />
+                                    &quot;Verify, don&apos;t trust&quot;{" "}
+                                    <FontAwesomeIcon icon={faFaceSmile} />
                                 </Radio>
                                 <FormControl pl={6}>
                                     <Input
