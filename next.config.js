@@ -1,13 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    reactStrictMode: true,
-}
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//     reactStrictMode: true,
+// }
 
-module.exports = {
-    trailingSlash: true,
-}
+// module.exports = {
+//     trailingSlash: true,
+// }
 
-module.exports = nextConfig
+// module.exports = nextConfig
 
 module.exports = {
     async headers() {
