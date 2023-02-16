@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import got from "got"
 import AdvancedSettings from "./AdvancedSettingsModal"
 import {
     Box,
@@ -65,43 +64,53 @@ export default function NftForm() {
     }, [contractInput, tokenIdInput])
 
     async function fetchUriData(_tokenUri: any) {
-        await fetch(_tokenUri)
-            .then(async (response) => {
-                if (!response.ok) {
-                    setTokenUriJson(response.statusText)
-                    throw new Error(response.statusText)
-                } else {
-                    setTokenUriJson(await response.json())
-                }
-            })
-            .catch((error) => {
-                console.log("error: " + error)
-                console.log("Trying through CORS proxy...")
-                fetchUriDataProxy(_tokenUri)
-            })
+        if (_tokenUri.startsWith("http")) {
+            await fetch(_tokenUri)
+                .then(async (response) => {
+                    if (!response.ok) {
+                        setTokenUriJson(response.statusText)
+                        throw new Error(response.statusText)
+                    } else {
+                        setTokenUriJson(await checkUriDataType(response))
+                    }
+                })
+                .catch((error) => {
+                    console.log("error: " + error)
+                    console.log("Trying through CORS proxy...")
+                    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(_tokenUri)}`)
+                        .then(async (response) => {
+                            if (!response.ok) {
+                                setTokenUriJson(response.statusText)
+                                throw new Error(response.statusText)
+                            } else {
+                                setTokenUriJson(await checkUriDataType(response))
+                            }
+                        })
+                        .catch((error) => {
+                            console.log("error: " + error)
+                        })
+                })
+        } else if (_tokenUri.startsWith("ipfs")) {
+            setTokenUriJson("IFPS not supported yet")
+        } else {
+            setTokenUriJson("NFT protocol not supported yet: " + _tokenUri)
+        }
     }
 
-    async function fetchUriDataProxy(_tokenUri: any) {
-        await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(_tokenUri)}`)
-            .then(async (response) => {
-                if (!response.ok) {
-                    setTokenUriJson(response.statusText)
-                    throw new Error(response.statusText)
-                } else {
-                    const data = await response.json()
-                    // If data is a binary response, convert it to json
-                    if (data.contents.startsWith("data:binary/octet-stream;base64")) {
-                        const base64 = data.contents.split(",")[1]
-                        const string = Buffer.from(base64, "base64").toString("utf8")
-                        setTokenUriJson(JSON.parse(string))
-                    } else {
-                        setTokenUriJson(JSON.parse(data.contents))
-                    }
-                }
-            })
-            .catch((error) => {
-                console.log("error: " + error)
-            })
+    async function checkUriDataType(response: any) {
+        const data = await response.json()
+
+        if (data?.contents.startsWith("data:binary/octet-stream;base64")) {
+            // If data is a binary response, convert it to json
+            const base64 = data.contents.split(",")[1]
+            const string = Buffer.from(base64, "base64").toString("utf8")
+            return JSON.parse(string)
+        } else if (data?.status.content_type.startsWith("application/json;")) {
+            // If data is a json response, return it
+            return JSON.parse(data.contents)
+        } else {
+            return "NFT data format not supported yet: " + data.contents
+        }
     }
 
     async function findNFt() {
