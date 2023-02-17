@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import AdvancedSettings from "./AdvancedSettingsModal"
+import Examples from "./Examples"
 import {
     Box,
     Flex,
@@ -16,6 +17,7 @@ import {
     Spacer,
     useDisclosure,
     Tooltip,
+    Container,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
@@ -168,93 +170,101 @@ export default function NftForm() {
         <>
             <Flex alignItems="center" direction="column">
                 <Flex paddingTop={10} alignItems="center" justifyContent="center">
-                    <Flex
-                        direction="column"
-                        background={formBackground}
-                        px={16}
-                        py={8}
-                        rounded={15}
-                    >
-                        <Heading textAlign={"center"} mb={6}>
-                            Where&apos;s My NFT?
-                        </Heading>
-                        <Flex direction="column" minWidth="max-content" alignItems="center" gap="5">
-                            <FormControl>
-                                <FormLabel>Contract Address:</FormLabel>
-                                <Input
-                                    placeholder="0x..."
-                                    value={contractInput}
-                                    onKeyPress={(e) => {
-                                        if (e.key === "Enter") {
-                                            findNFt()
-                                        }
-                                    }}
-                                    onInput={(e) =>
-                                        setContractInput((e.target as HTMLInputElement).value)
-                                    }
-                                ></Input>
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Token ID:</FormLabel>
-                                <Input
-                                    placeholder="12345"
-                                    value={tokenIdInput}
-                                    onKeyPress={(e) => {
-                                        if (e.key === "Enter") {
-                                            findNFt()
-                                        }
-                                    }}
-                                    onInput={(e) =>
-                                        setTokenIdInput((e.target as HTMLInputElement).value)
-                                    }
-                                ></Input>
-                            </FormControl>
-
-                            <Flex minWidth="100%">
-                                <Box width={"40px"} />
-                                <Spacer />
-                                <Button
-                                    isDisabled={tokenUriJson == "Loading" ? true : false}
-                                    colorScheme="teal"
-                                    onClick={() => {
-                                        findNFt()
-                                    }}
-                                >
-                                    {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
-                                </Button>
-                                <Spacer />
-                                <Tooltip
-                                    hasArrow
-                                    openDelay={300}
-                                    placement="bottom"
-                                    label="Select RPC Provider"
-                                >
-                                    <IconButton
-                                        //Stops the tooltip opening when modal closes
-                                        onFocus={(e) => e.preventDefault()}
-                                        onClick={() => {
-                                            onOpen()
-                                            // If there's an RPC error, don't clear the tokenUriJson so the error is visible when the modal opens
-                                            if (tokenUriJson != "RPC Error") {
-                                                setBlockNumberRefetchResponse("")
+                    <Container minW="lg">
+                        <Flex
+                            direction="column"
+                            background={formBackground}
+                            px={16}
+                            py={8}
+                            rounded={15}
+                        >
+                            <Heading textAlign={"center"} mb={6}>
+                                Where&apos;s My NFT?
+                            </Heading>
+                            <Examples />
+                            <Flex
+                                direction="column"
+                                minWidth="max-content"
+                                alignItems="center"
+                                gap="5"
+                            >
+                                <FormControl pt={8}>
+                                    <FormLabel>Contract Address:</FormLabel>
+                                    <Input
+                                        placeholder="0x..."
+                                        value={contractInput}
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter") {
+                                                findNFt()
                                             }
                                         }}
-                                        aria-label={"Advanced settings"}
+                                        onInput={(e) =>
+                                            setContractInput((e.target as HTMLInputElement).value)
+                                        }
+                                    ></Input>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel>Token ID:</FormLabel>
+                                    <Input
+                                        placeholder="12345"
+                                        value={tokenIdInput}
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter") {
+                                                findNFt()
+                                            }
+                                        }}
+                                        onInput={(e) =>
+                                            setTokenIdInput((e.target as HTMLInputElement).value)
+                                        }
+                                    ></Input>
+                                </FormControl>
+
+                                <Flex minWidth="100%">
+                                    <Box width={"40px"} />
+                                    <Spacer />
+                                    <Button
+                                        isDisabled={tokenUriJson == "Loading" ? true : false}
+                                        colorScheme="teal"
+                                        onClick={() => {
+                                            findNFt()
+                                        }}
                                     >
-                                        {tokenUriJson == "RPC Error" ? (
-                                            <FontAwesomeIcon
-                                                color="red"
-                                                icon={faWarning}
-                                                size={"lg"}
-                                            />
-                                        ) : (
-                                            <FontAwesomeIcon icon={faGear} size={"lg"} />
-                                        )}
-                                    </IconButton>
-                                </Tooltip>
+                                        {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
+                                    </Button>
+                                    <Spacer />
+                                    <Tooltip
+                                        hasArrow
+                                        openDelay={300}
+                                        placement="bottom"
+                                        label="Select RPC Provider"
+                                    >
+                                        <IconButton
+                                            //Stops the tooltip opening when modal closes
+                                            onFocus={(e) => e.preventDefault()}
+                                            onClick={() => {
+                                                onOpen()
+                                                // If there's an RPC error, don't clear the tokenUriJson so the error is visible when the modal opens
+                                                if (tokenUriJson != "RPC Error") {
+                                                    setBlockNumberRefetchResponse("")
+                                                }
+                                            }}
+                                            aria-label={"Advanced settings"}
+                                        >
+                                            {tokenUriJson == "RPC Error" ? (
+                                                <FontAwesomeIcon
+                                                    color="red"
+                                                    icon={faWarning}
+                                                    size={"lg"}
+                                                />
+                                            ) : (
+                                                <FontAwesomeIcon icon={faGear} size={"lg"} />
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+                                </Flex>
                             </Flex>
                         </Flex>
-                    </Flex>
+                    </Container>
                 </Flex>
                 {tokenUriJson?.image && (
                     <Image
