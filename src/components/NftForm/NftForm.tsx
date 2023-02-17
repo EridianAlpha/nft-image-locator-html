@@ -22,6 +22,7 @@ import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
 import { useContractRead, useBlockNumber } from "wagmi"
 
 export default function NftForm() {
+    const isSSR = typeof window === "undefined"
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Use refetch to manually test the connection
@@ -30,18 +31,22 @@ export default function NftForm() {
     const formBackground = useColorModeValue("gray.100", "gray.700")
     const contractAbi = ["function tokenURI(uint256 tokenId) view returns (string)"]
 
-    // Retrieve local storage values
-    let localContractInput: string | null
-    let localTokenIdInput: string | null
-    const isSSR = typeof window === "undefined"
+    //Get values from URL params
+    let urlParams: URLSearchParams
+    let urlContractInput: string | null
+    let urlTokenIdInput: string | null
+    let urlFindNft: string | null
+
     if (!isSSR) {
-        localContractInput = window.localStorage.getItem("contractInput")
-        localTokenIdInput = window.localStorage.getItem("tokenIdInput")
+        urlParams = new URLSearchParams(window.location.search)
+        urlContractInput = urlParams.get("contract")
+        urlTokenIdInput = urlParams.get("tokenId")
+        urlFindNft = urlParams.get("findNft")
     }
 
     // USE STATE
-    const [contractInput, setContractInput] = useState<any>(localContractInput || "")
-    const [tokenIdInput, setTokenIdInput] = useState<any>(localTokenIdInput || "")
+    const [contractInput, setContractInput] = useState<any>(urlContractInput || "")
+    const [tokenIdInput, setTokenIdInput] = useState<any>(urlTokenIdInput || "")
     const [tokenUri, setTokenUri] = useState<any>()
     const [tokenUriJson, setTokenUriJson] = useState<any>()
     const [contractData, setContractData] = useState<any>()
@@ -56,12 +61,21 @@ export default function NftForm() {
         args: [tokenIdInput],
     })
 
+    // Update url params when inputs change
     useEffect(() => {
-        if (window) {
-            window!.localStorage.setItem("contractInput", contractInput)
-            window!.localStorage.setItem("tokenIdInput", tokenIdInput)
+        if (!isSSR) {
+            urlParams.set("contract", contractInput)
+            urlParams.set("tokenId", tokenIdInput)
+            window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`)
         }
     }, [contractInput, tokenIdInput])
+
+    // Run findNft when url param is set to true
+    useEffect(() => {
+        if (urlFindNft === "true") {
+            findNFt()
+        }
+    }, [urlFindNft])
 
     async function fetchUriData(_tokenUri: any) {
         if (_tokenUri.startsWith("http")) {
@@ -114,6 +128,8 @@ export default function NftForm() {
     }
 
     async function findNFt() {
+        // Set to "Loading" before and after testing the connection
+        // so the spinner is shown and user can't click the button again
         setTokenUriJson("Loading")
         const blockNumberResponse = await testRpcConnection()
         setTokenUriJson("Loading")
