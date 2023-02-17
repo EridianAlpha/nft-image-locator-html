@@ -22,21 +22,25 @@ import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
 import { useContractRead, useBlockNumber } from "wagmi"
 
 export default function NftForm() {
+    // Check if the current render is on the server (Server Side Render) or client
     const isSSR = typeof window === "undefined"
+
+    // Get modal open/close functions
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Use refetch to manually test the connection
     const { refetch: blockNumberRefetch } = useBlockNumber()
 
+    // Variables
     const formBackground = useColorModeValue("gray.100", "gray.700")
     const contractAbi = ["function tokenURI(uint256 tokenId) view returns (string)"]
+    const contractFunctionName = "tokenURI"
 
-    //Get values from URL params
+    // Get values from URL params
     let urlParams: URLSearchParams
     let urlContractInput: string | null
     let urlTokenIdInput: string | null
     let urlFindNft: string | null
-
     if (!isSSR) {
         urlParams = new URLSearchParams(window.location.search)
         urlContractInput = urlParams.get("contract")
@@ -54,10 +58,12 @@ export default function NftForm() {
     // State used for connection testing
     const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
 
+    // Read the contract data, using refetch to manually trigger
+    // rather than only on change or load
     const { refetch: contractDataRefetch } = useContractRead({
         address: contractInput,
         abi: contractAbi,
-        functionName: "tokenURI",
+        functionName: contractFunctionName,
         args: [tokenIdInput],
     })
 
