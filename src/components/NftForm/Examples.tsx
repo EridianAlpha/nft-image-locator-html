@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-import { Image, Link, Text, Flex, Center } from "@chakra-ui/react"
+import { Image, Text, Flex, Center } from "@chakra-ui/react"
 
 export default function Examples({
     contractInput,
