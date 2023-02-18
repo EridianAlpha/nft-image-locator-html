@@ -181,7 +181,13 @@ export default function NftForm() {
                             <Heading textAlign={"center"} mb={6}>
                                 Where&apos;s My NFT?
                             </Heading>
-                            <Examples />
+                            <Examples
+                                contractInput={contractInput}
+                                tokenIdInput={tokenIdInput}
+                                setContractInput={setContractInput}
+                                setTokenIdInput={setTokenIdInput}
+                                findNFt={findNFt}
+                            />
                             <Flex
                                 direction="column"
                                 minWidth="max-content"
