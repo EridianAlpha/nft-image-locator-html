@@ -1,4 +1,5 @@
 import WalletButtonMenu from "./WalletButtonMenu"
+import { chainName, chainIcon } from "../../utils/chainDetails"
 
 import React, { useEffect, useState, useContext } from "react"
 import { toHex, truncateAddress } from "../../utils/utils"
@@ -54,16 +55,6 @@ export default function WalletButton() {
     // Store the state of the copy icon on the menu so it can be
     // reset when the menu is closed
     const [copyIcon, setCopyIcon] = useState(<FontAwesomeIcon icon={faCopy} size={"lg"} />)
-
-    let chainIcon: string
-    let chainName: string
-    if (chain?.id === 1) {
-        chainIcon = "./EthereumLogo.svg"
-        chainName = "Mainnet"
-    } else if (provider._network.chainId === 5) {
-        chainIcon = "./GoerliLogo.svg"
-        chainName = "Goerli"
-    }
 
     const { walletConnected, setWalletConnected } = useContext(WalletConnectedContext)
 
@@ -135,9 +126,9 @@ export default function WalletButton() {
                                 }}
                                 aria-label={"Switch chain"}
                             >
-                                <Image src={chainIcon}></Image>
+                                <Image src={chainIcon(chain, provider)}></Image>
                                 {windowSize.width > 700 ? (
-                                    <Text marginLeft={2}>{chainName}</Text>
+                                    <Text marginLeft={2}>{chainName(chain, provider)}</Text>
                                 ) : null}
                             </Button>
                             <Menu

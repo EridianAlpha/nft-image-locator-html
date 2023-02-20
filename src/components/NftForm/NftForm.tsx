@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
 import AdvancedSettings from "./AdvancedSettingsModal"
+import { chainName, chainIcon } from "../../utils/chainDetails"
 import Examples from "./Examples"
+
 import {
     Box,
+    Text,
     Flex,
     Heading,
     Input,
@@ -20,8 +23,11 @@ import {
     Container,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
+import { faGear, faWarning, faWallet } from "@fortawesome/free-solid-svg-icons"
 import { useContractRead, useBlockNumber } from "wagmi"
+
+import { useNetwork, useProvider, useAccount } from "wagmi"
+import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit"
 
 export default function NftForm() {
     // Check if the current render is on the server (Server Side Render) or client
@@ -166,6 +172,13 @@ export default function NftForm() {
         return response
     }
 
+    const { chain } = useNetwork()
+    const provider = useProvider()
+    const { address, isConnected, status } = useAccount()
+
+    const { openChainModal } = useChainModal()
+    const { openConnectModal } = useConnectModal()
+
     return (
         <>
             <Flex alignItems="center" direction="column">
@@ -195,6 +208,57 @@ export default function NftForm() {
                                 gap="5"
                             >
                                 <FormControl pt={8}>
+                                    <FormLabel>Network:</FormLabel>
+                                    {isConnected &&
+                                    // walletConnected &&
+                                    window.localStorage.getItem("connected") ? (
+                                        <Button
+                                            marginRight={2}
+                                            paddingLeft={2}
+                                            paddingRight={2}
+                                            onClick={async () => {
+                                                openChainModal ? openChainModal() : null
+                                            }}
+                                            aria-label={"Change network"}
+                                        >
+                                            <Image src={chainIcon(chain, provider)}></Image>
+                                            <Text marginLeft={2}>{chainName(chain, provider)}</Text>
+                                        </Button>
+                                    ) : (
+                                        <Flex direction={"row"} wrap={"wrap"}>
+                                            <Button
+                                                isDisabled={true}
+                                                marginRight={2}
+                                                paddingLeft={2}
+                                                paddingRight={2}
+                                                aria-label={"Change network"}
+                                            >
+                                                <Image src={"./EthereumLogo.svg"}></Image>
+                                                <Text marginLeft={2}>{"Ethereum Mainnet"}</Text>
+                                            </Button>
+                                            <Tooltip
+                                                hasArrow
+                                                openDelay={300}
+                                                placement="top"
+                                                label="Connect wallet to change network"
+                                            >
+                                                <IconButton
+                                                    onClick={async () => {
+                                                        openConnectModal ? openConnectModal() : null
+                                                        window!.localStorage.setItem(
+                                                            "connected",
+                                                            "injected"
+                                                        )
+                                                    }}
+                                                    aria-label={"Connect wallet network"}
+                                                >
+                                                    <FontAwesomeIcon icon={faWallet} size={"lg"} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Flex>
+                                    )}
+                                </FormControl>
+                                <FormControl>
                                     <FormLabel>Contract Address:</FormLabel>
                                     <Input
                                         placeholder="0x..."
@@ -241,7 +305,7 @@ export default function NftForm() {
                                     <Tooltip
                                         hasArrow
                                         openDelay={300}
-                                        placement="bottom"
+                                        placement="top"
                                         label="Select RPC Provider"
                                     >
                                         <IconButton
