@@ -113,16 +113,22 @@ export default function AdvancedSettingsModal({
                         <RadioGroup onChange={setRadioValue} value={radioValue}>
                             <Stack>
                                 <Radio value="public">
-                                    <Badge
-                                        variant="subtle"
-                                        fontSize="0.8em"
-                                        colorScheme="yellow"
-                                        mb={0.5}
-                                    >
-                                        Public Provider (Automatic)
-                                    </Badge>{" "}
-                                    &quot;Trust, don&apos;t verify&quot;{" "}
-                                    <FontAwesomeIcon icon={faFaceFrown} />
+                                    <Flex direction={"row"} wrap={"wrap"} columnGap={"10px"}>
+                                        <Box>
+                                            <Badge
+                                                variant="subtle"
+                                                fontSize="0.8em"
+                                                colorScheme="yellow"
+                                                mb={0.5}
+                                            >
+                                                Public Provider (Automatic)
+                                            </Badge>
+                                        </Box>
+                                        <Box>
+                                            &quot;Trust, don&apos;t verify&quot;{" "}
+                                            <FontAwesomeIcon icon={faFaceFrown} />
+                                        </Box>
+                                    </Flex>
                                 </Radio>
                                 <FormControl pl={6} mt={0}>
                                     <FormHelperText mt={0}>
@@ -132,16 +138,22 @@ export default function AdvancedSettingsModal({
                                 </FormControl>
                                 <Box pt={6}></Box>
                                 <Radio value="custom">
-                                    <Badge
-                                        variant="subtle"
-                                        fontSize="0.8em"
-                                        colorScheme="blue"
-                                        mb={0.5}
-                                    >
-                                        Custom Provider (Manual)
-                                    </Badge>{" "}
-                                    &quot;Verify, don&apos;t trust&quot;{" "}
-                                    <FontAwesomeIcon icon={faFaceSmile} />
+                                    <Flex direction={"row"} wrap={"wrap"} columnGap={"10px"}>
+                                        <Box>
+                                            <Badge
+                                                variant="subtle"
+                                                fontSize="0.8em"
+                                                colorScheme="blue"
+                                                mb={0.5}
+                                            >
+                                                Custom Provider (Manual)
+                                            </Badge>
+                                        </Box>
+                                        <Box>
+                                            &quot;Verify, don&apos;t trust&quot;{" "}
+                                            <FontAwesomeIcon icon={faFaceSmile} />
+                                        </Box>
+                                    </Flex>
                                 </Radio>
                                 <FormControl pl={6}>
                                     <Input
