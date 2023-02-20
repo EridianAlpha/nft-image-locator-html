@@ -7,7 +7,7 @@ import ColorModeToggle from "./ColorModeToggle"
 import WalletButton from "./WalletButton"
 import Link from "next/link"
 
-export default function Header() {
+export default function Header({ windowSize }) {
     return (
         <>
             <Box bg={useColorModeValue("gray.100", "gray.900")} pl={4}>
@@ -27,7 +27,7 @@ export default function Header() {
                                 <FontAwesomeIcon icon={faGithub} size={"lg"} />
                             </IconButton>
                         </Link>
-                        <WalletButton />
+                        <WalletButton windowSize={windowSize} />
                         <Flex alignItems={"center"}></Flex>
                     </HStack>
                 </Flex>

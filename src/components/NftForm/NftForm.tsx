@@ -29,7 +29,7 @@ import { useContractRead, useBlockNumber } from "wagmi"
 import { useNetwork, useProvider, useAccount } from "wagmi"
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit"
 
-export default function NftForm() {
+export default function NftForm({ windowSize }) {
     // Check if the current render is on the server (Server Side Render) or client
     const isSSR = typeof window === "undefined"
 
@@ -189,7 +189,7 @@ export default function NftForm() {
                             background={formBackground}
                             px={16}
                             py={8}
-                            rounded={15}
+                            rounded={windowSize.width > 600 ? 15 : 0}
                         >
                             <Heading textAlign={"center"} mb={6}>
                                 Where&apos;s My NFT?

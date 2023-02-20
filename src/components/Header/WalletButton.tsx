@@ -31,7 +31,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWallet, faCopy } from "@fortawesome/free-solid-svg-icons"
 
-export default function WalletButton() {
+export default function WalletButton({ windowSize }) {
     // Everything comes from Wagmi
     const provider = useProvider()
     const { address, isConnected, status } = useAccount()
@@ -91,24 +91,6 @@ export default function WalletButton() {
     }
     useEffect(() => {
         checkIfAccountChanged()
-    }, [])
-
-    // Rerender when window size changes and save
-    // window size to state to allow conditional rendering
-    const isSSR = typeof window === "undefined"
-    const [windowSize, setWindowSize] = useState({
-        width: isSSR ? 0 : window.innerWidth,
-        height: isSSR ? 0 : window.innerHeight,
-    })
-    useEffect(() => {
-        const handleResizeWindow = () =>
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight })
-        // subscribe to window resize event "onComponentDidMount"
-        window.addEventListener("resize", handleResizeWindow)
-        return () => {
-            // unsubscribe "onComponentDestroy"
-            window.removeEventListener("resize", handleResizeWindow)
-        }
     }, [])
 
     return (
