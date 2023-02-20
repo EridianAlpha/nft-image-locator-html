@@ -236,9 +236,9 @@ export default function AdvancedSettingsModal({
                         ) : null}
                         {blockNumberRefetchResponse?.status == "success" ? (
                             <Box>
-                                <FormControl pl={6} mt={0} pr={3}>
+                                <FormControl mt={0} pr={3}>
                                     <FormHelperText mt={0} wordBreak={"break-word"}>
-                                        Current block number:
+                                        Current block:
                                         {"\n"}
                                         <Code>{blockNumberRefetchResponse?.data}</Code>
                                     </FormHelperText>
