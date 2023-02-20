@@ -29,9 +29,19 @@ export default function Examples({
     useEffect(() => {
         if (!isSSR && !urlParamExample) {
             const urlParams = new URLSearchParams(window.location.search)
-            setUrlParamExample(urlParams.get("example"))
+            // If the content of the inputs matches the example,
+            // then set the example param
+            examples.map((example) => {
+                if (
+                    example.example == urlParams.get("example") &&
+                    contractInput == example.contractInput &&
+                    tokenIdInput == example.tokenIdInput
+                ) {
+                    setUrlParamExample(urlParams.get("example"))
+                }
+            })
         }
-    })
+    }, [contractInput, tokenIdInput, urlParamExample])
 
     const examples = [
         {
@@ -66,6 +76,31 @@ export default function Examples({
         },
     ]
 
+    useEffect(() => {
+        // If the inputs change, but they don't equal the example, remove the example param
+        if (urlParamExample) {
+            // write a for each loop over examples array
+            // if the contractInput and tokenIdInput match the example, then don't delete the param
+            // else delete the param
+
+            examples.forEach((example) => {
+                console.log("HERE1")
+                const urlParams = new URLSearchParams(window.location.search)
+                if (
+                    urlParamExample == example.example &&
+                    (contractInput !== example.contractInput ||
+                        tokenIdInput !== example.tokenIdInput)
+                ) {
+                    console.log("HERE2")
+
+                    urlParams.delete("example")
+                    window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`)
+                    setUrlParamExample(null)
+                }
+            })
+        }
+    }, [contractInput, tokenIdInput])
+
     return (
         <>
             <Center>
@@ -85,10 +120,11 @@ export default function Examples({
                         cursor="pointer"
                         border={urlParamExample == example.example ? "2px solid white" : "none"}
                         marginLeft={3}
-                        boxSize="3rem"
+                        boxSize="45px"
                         borderRadius="full"
                         mr="12px"
                         src={example.src}
+                        _hover={{ border: "2px solid white" }}
                     />
                 ))}
             </Flex>
