@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import AdvancedSettings from "./AdvancedSettingsModal"
 import { chainName, chainIcon } from "../../utils/chainDetails"
 import Examples from "./Examples"
+import { fetchUriData } from "../../utils/fetchUriData"
 
 import {
     Box,
@@ -91,56 +92,6 @@ export default function NftForm({ windowSize }) {
         }
     }, [urlFindNft])
 
-    async function fetchUriData(_tokenUri: any) {
-        if (_tokenUri.startsWith("http")) {
-            await fetch(_tokenUri)
-                .then(async (response) => {
-                    if (!response.ok) {
-                        setTokenUriJson(response.statusText)
-                        throw new Error(response.statusText)
-                    } else {
-                        setTokenUriJson(await checkUriDataType(response))
-                    }
-                })
-                .catch((error) => {
-                    console.log("error: " + error)
-                    console.log("Trying through CORS proxy...")
-                    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(_tokenUri)}`)
-                        .then(async (response) => {
-                            if (!response.ok) {
-                                setTokenUriJson(response.statusText)
-                                throw new Error(response.statusText)
-                            } else {
-                                setTokenUriJson(await checkUriDataType(response))
-                            }
-                        })
-                        .catch((error) => {
-                            console.log("error: " + error)
-                        })
-                })
-        } else if (_tokenUri.startsWith("ipfs")) {
-            setTokenUriJson("IFPS not supported yet")
-        } else {
-            setTokenUriJson("NFT protocol not supported yet: " + _tokenUri)
-        }
-    }
-
-    async function checkUriDataType(response: any) {
-        const data = await response.json()
-
-        if (data?.contents.startsWith("data:binary/octet-stream;base64")) {
-            // If data is a binary response, convert it to json
-            const base64 = data.contents.split(",")[1]
-            const string = Buffer.from(base64, "base64").toString("utf8")
-            return JSON.parse(string)
-        } else if (data?.status.content_type.startsWith("application/json;")) {
-            // If data is a json response, return it
-            return JSON.parse(data.contents)
-        } else {
-            return "NFT data format not supported yet: " + data.contents
-        }
-    }
-
     async function findNFt() {
         // Set to "Loading" before and after testing the connection
         // so the spinner is shown and user can't click the button again
@@ -153,7 +104,7 @@ export default function NftForm({ windowSize }) {
             if (response.isSuccess) {
                 setContractData(response.data)
                 setTokenUri(response.data)
-                fetchUriData(response.data)
+                setTokenUriJson(await fetchUriData(response.data))
             } else {
                 setContractData(null)
                 setTokenUriJson("NFT Not Found")
