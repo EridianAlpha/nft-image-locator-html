@@ -187,9 +187,9 @@ export default function NftForm({ windowSize }) {
                         <Flex
                             direction="column"
                             background={formBackground}
-                            px={16}
+                            px={windowSize.width > 600 ? 16 : 8}
                             py={8}
-                            rounded={windowSize.width > 600 ? 15 : 0}
+                            rounded={windowSize.width > 540 ? 15 : 0}
                         >
                             <Heading textAlign={"center"} mb={6}>
                                 Where&apos;s My NFT?
@@ -347,8 +347,13 @@ export default function NftForm({ windowSize }) {
                     />
                 )}
                 {tokenUriJson && tokenUriJson !== "Loading" && (
-                    <Box pt={5} pb={20} maxWidth={"90%"} overflow={"scroll"}>
-                        <Code rounded={15} p={5}>
+                    <Box
+                        pt={5}
+                        pb={20}
+                        maxWidth={windowSize.width > 540 ? "90%" : "100%"}
+                        overflow={"scroll"}
+                    >
+                        <Code rounded={windowSize.width > 540 ? 15 : 0} p={5}>
                             <pre>{JSON.stringify(tokenUriJson, null, 2)}</pre>
                         </Code>
                     </Box>
