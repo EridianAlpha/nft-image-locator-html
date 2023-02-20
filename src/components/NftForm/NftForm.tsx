@@ -169,8 +169,8 @@ export default function NftForm() {
     return (
         <>
             <Flex alignItems="center" direction="column">
-                <Flex paddingTop={10} alignItems="center" justifyContent="center">
-                    <Container minW="lg">
+                <Flex pt={10} pr={0} alignItems="center" justifyContent="center">
+                    <Container padding={0} minW="300px" maxW={"700px"}>
                         <Flex
                             direction="column"
                             background={formBackground}
@@ -277,6 +277,7 @@ export default function NftForm() {
                         mt={5}
                         borderRadius="full"
                         boxSize="200px"
+                        objectFit="cover"
                         alt="NFT Image"
                         src={tokenUriJson.image}
                     />

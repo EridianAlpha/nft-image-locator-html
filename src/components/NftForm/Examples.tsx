@@ -27,19 +27,35 @@ export default function Examples({
     // use it to set the border of the selected example
     const isSSR = typeof window === "undefined"
     useEffect(() => {
-        if (!isSSR && !urlParamExample) {
+        if (!isSSR) {
             const urlParams = new URLSearchParams(window.location.search)
-            // If the content of the inputs matches the example,
-            // then set the example param
-            examples.map((example) => {
-                if (
-                    example.example == urlParams.get("example") &&
-                    contractInput == example.contractInput &&
-                    tokenIdInput == example.tokenIdInput
-                ) {
-                    setUrlParamExample(urlParams.get("example"))
-                }
-            })
+            if (urlParamExample) {
+                examples.forEach((example) => {
+                    if (
+                        urlParamExample == example.example &&
+                        (contractInput !== example.contractInput ||
+                            tokenIdInput !== example.tokenIdInput)
+                    ) {
+                        urlParams.delete("example")
+                        window.history.replaceState(
+                            {},
+                            "",
+                            `${window.location.pathname}?${urlParams}`
+                        )
+                        setUrlParamExample(null)
+                    }
+                })
+            } else {
+                examples.map((example) => {
+                    if (
+                        example.example == urlParams.get("example") &&
+                        contractInput == example.contractInput &&
+                        tokenIdInput == example.tokenIdInput
+                    ) {
+                        setUrlParamExample(urlParams.get("example"))
+                    }
+                })
+            }
         }
     }, [contractInput, tokenIdInput, urlParamExample])
 
@@ -51,10 +67,10 @@ export default function Examples({
             src: "https://8biticon.com/static/images/tokens/481368551588.png",
         },
         {
-            contractInput: "0x880af717abba38f31ca21673843636a355fb45f3",
-            tokenIdInput: "191",
+            contractInput: "0xd9b78a2f1dafc8bb9c60961790d2beefebee56f4",
+            tokenIdInput: "7013",
             example: "2",
-            src: "https://i.seadn.io/gae/osFzhiSnm23HAQF5tCO2_OOChMYMLe4L7ACsFo4c6NWyG1ZPl7JeqJXdCxkOVL_fkcCh9-TI7bYo9fBNI665fE5EFKyfYWXOjFkrsA?auto=format&w=1000",
+            src: "https://i.seadn.io/gae/HtMUqt4dLbLfGBDWscXwuoIGkkZYCB1bA4QgYw1UUERBkEu5g7Dgy8RFpc6XIpyPEb4OK6entlPFlRKbxABeUtYONxXEnmXFaSg7?auto=format&w=1000",
         },
         {
             contractInput: "0x48db94c563115cb0e17c360d609aa5cb72bbc624",
@@ -74,32 +90,13 @@ export default function Examples({
             example: "5",
             src: "https://assets.poap.xyz/2022-bankless-badge-2022-logo-1643686754396.png",
         },
+        {
+            contractInput: "0x5755ab845ddeab27e1cfce00cd629b2e135acc3d",
+            tokenIdInput: "2384",
+            example: "6",
+            src: "https://openseauserdata.com/files/322618c561f2a308fff0e3c75b980fc1.svg",
+        },
     ]
-
-    useEffect(() => {
-        // If the inputs change, but they don't equal the example, remove the example param
-        if (urlParamExample) {
-            // write a for each loop over examples array
-            // if the contractInput and tokenIdInput match the example, then don't delete the param
-            // else delete the param
-
-            examples.forEach((example) => {
-                console.log("HERE1")
-                const urlParams = new URLSearchParams(window.location.search)
-                if (
-                    urlParamExample == example.example &&
-                    (contractInput !== example.contractInput ||
-                        tokenIdInput !== example.tokenIdInput)
-                ) {
-                    console.log("HERE2")
-
-                    urlParams.delete("example")
-                    window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`)
-                    setUrlParamExample(null)
-                }
-            })
-        }
-    }, [contractInput, tokenIdInput])
 
     return (
         <>
@@ -108,7 +105,13 @@ export default function Examples({
                     Examples
                 </Text>
             </Center>
-            <Flex pt={3} direction={"row"} justifyContent={"space-around"}>
+            <Flex
+                pt={3}
+                direction={"row"}
+                justifyContent={"space-around"}
+                wrap={"wrap"}
+                rowGap={"20px"}
+            >
                 {examples.map((example) => (
                     <Image
                         key={example.example}
@@ -120,7 +123,8 @@ export default function Examples({
                         cursor="pointer"
                         border={urlParamExample == example.example ? "2px solid white" : "none"}
                         marginLeft={3}
-                        boxSize="45px"
+                        objectFit="cover"
+                        boxSize="55px"
                         borderRadius="full"
                         mr="12px"
                         src={example.src}
