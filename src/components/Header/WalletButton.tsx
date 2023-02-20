@@ -125,7 +125,7 @@ export default function WalletButton() {
             <ClientOnly>
                 <Box paddingLeft={10}>
                     {isConnected && walletConnected && window.localStorage.getItem("connected") ? (
-                        <>
+                        <Flex direction={"row"}>
                             <Button
                                 marginRight={2}
                                 paddingLeft={2}
@@ -202,7 +202,7 @@ export default function WalletButton() {
                                 )}
                                 <WalletButtonMenu copyIcon={copyIcon} setCopyIcon={setCopyIcon} />
                             </Menu>
-                        </>
+                        </Flex>
                     ) : (
                         <>
                             {status == "connecting" && window.localStorage.getItem("connected") ? (
