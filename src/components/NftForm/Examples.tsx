@@ -79,10 +79,10 @@ export default function Examples({
             src: "https://supernormal-autoreveal-trey1k1k.s3.us-east-2.amazonaws.com/749.jpg",
         },
         {
-            contractInput: "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
-            tokenIdInput: "100",
+            contractInput: "0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d",
+            tokenIdInput: "5691",
             example: "4",
-            src: "https://i.seadn.io/gcs/files/a55f9d8aab226d601874bf7593649549.png?auto=format&w=1000",
+            src: "https://ipfs.io/ipfs/QmbEkz9dzPXBtphM36oCYnNDLGMdt3jFxqf34VZfKG7ZHM",
         },
         {
             contractInput: "TODO-POAP",
@@ -95,6 +95,12 @@ export default function Examples({
             tokenIdInput: "2384",
             example: "6",
             src: "https://openseauserdata.com/files/322618c561f2a308fff0e3c75b980fc1.svg",
+        },
+        {
+            contractInput: "0x0c60b40289ff15ff6afdfa668d1a743dc6e53cf3",
+            tokenIdInput: "210",
+            example: "7",
+            src: "https://afundamentaldispute.com/api/art-placeholder/210?942885128141190395537709756960567882489310811254",
         },
     ]
 

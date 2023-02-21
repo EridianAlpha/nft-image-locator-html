@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import AdvancedSettings from "./AdvancedSettingsModal"
+import NftImage from "./NftImage"
 import { chainName, chainIcon } from "../../utils/chainDetails"
 import Examples from "./Examples"
 import { fetchUriData } from "../../utils/fetchUriData"
@@ -39,6 +40,13 @@ export default function NftForm({ windowSize }) {
 
     // Use refetch to manually test the connection
     const { refetch: blockNumberRefetch } = useBlockNumber()
+
+    // Get wallet functions
+    const { chain } = useNetwork()
+    const provider = useProvider()
+    const { isConnected } = useAccount()
+    const { openChainModal } = useChainModal()
+    const { openConnectModal } = useConnectModal()
 
     // Variables
     const formBackground = useColorModeValue("gray.100", "gray.700")
@@ -101,6 +109,8 @@ export default function NftForm({ windowSize }) {
 
         if (blockNumberResponse.isSuccess) {
             const response = await contractDataRefetch()
+            console.log("response", response)
+
             if (response.isSuccess) {
                 setContractData(response.data)
                 setTokenUri(response.data)
@@ -122,13 +132,6 @@ export default function NftForm({ windowSize }) {
         response.isSuccess ? setTokenUriJson("") : setTokenUriJson("RPC Error")
         return response
     }
-
-    const { chain } = useNetwork()
-    const provider = useProvider()
-    const { address, isConnected, status } = useAccount()
-
-    const { openChainModal } = useChainModal()
-    const { openConnectModal } = useConnectModal()
 
     return (
         <>
@@ -287,16 +290,7 @@ export default function NftForm({ windowSize }) {
                         </Flex>
                     </Container>
                 </Flex>
-                {tokenUriJson?.image && (
-                    <Image
-                        mt={5}
-                        borderRadius="full"
-                        boxSize="200px"
-                        objectFit="cover"
-                        alt="NFT Image"
-                        src={tokenUriJson.image}
-                    />
-                )}
+                {tokenUriJson?.image && <NftImage src={tokenUriJson.image} />}
                 {tokenUriJson && tokenUriJson !== "Loading" && (
                     <Box
                         pt={5}
