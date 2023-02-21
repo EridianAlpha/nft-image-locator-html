@@ -189,7 +189,7 @@ export default function NftForm({ windowSize }) {
                                             </Button>
                                             <Tooltip
                                                 hasArrow
-                                                openDelay={300}
+                                                openDelay={100}
                                                 placement="top"
                                                 label="Connect wallet to change network"
                                             >
