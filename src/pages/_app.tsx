@@ -6,6 +6,7 @@ import { ThemeContext, WalletConnectedContext, CustomRpcProviderContext } from "
 
 import { ChakraProvider } from "@chakra-ui/react"
 import { WagmiConfig, createClient, configureChains, mainnet, goerli } from "wagmi"
+import { gnosis } from "wagmi/chains"
 import { publicProvider } from "wagmi/providers/public"
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 
@@ -44,7 +45,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     // Create Wagmi client
     const { chains, provider } = configureChains(
-        [mainnet, goerli],
+        [mainnet, goerli, gnosis],
         [
             customRpcProvider
                 ? jsonRpcProvider({

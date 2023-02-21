@@ -290,7 +290,9 @@ export default function NftForm({ windowSize }) {
                         </Flex>
                     </Container>
                 </Flex>
-                {tokenUriJson?.image && <NftImage src={tokenUriJson.image} />}
+                {/* POAP uses .image_url instead of the ERC-721 .image standard */}
+                {(tokenUriJson?.image && <NftImage src={tokenUriJson.image} />) ||
+                    (tokenUriJson?.image_url && <NftImage src={tokenUriJson.image_url} />)}
                 {tokenUriJson && tokenUriJson !== "Loading" && (
                     <Box
                         pt={5}
