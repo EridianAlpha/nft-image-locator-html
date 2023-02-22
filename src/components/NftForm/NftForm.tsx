@@ -247,7 +247,13 @@ export default function NftForm({ windowSize }) {
                                     <Box width={"40px"} />
                                     <Spacer />
                                     <Button
-                                        isDisabled={tokenUriJson == "Loading" ? true : false}
+                                        isDisabled={
+                                            tokenUriJson == "Loading" ||
+                                            !contractInput ||
+                                            !tokenIdInput
+                                                ? true
+                                                : false
+                                        }
                                         colorScheme="teal"
                                         onClick={() => {
                                             findNFt()
@@ -290,13 +296,11 @@ export default function NftForm({ windowSize }) {
                         </Flex>
                     </Container>
                 </Flex>
-                {/* POAP uses .image_url instead of the ERC-721 .image standard */}
-                {(tokenUriJson?.image && <NftImage src={tokenUriJson.image} />) ||
-                    (tokenUriJson?.image_url && <NftImage src={tokenUriJson.image_url} />)}
+                <NftImage tokenUriJson={tokenUriJson} />
                 {tokenUriJson && tokenUriJson !== "Loading" && (
                     <Box
                         pt={5}
-                        pb={20}
+                        pb={"250px"}
                         maxWidth={windowSize.width > 540 ? "90%" : "100%"}
                         overflow={"scroll"}
                     >
