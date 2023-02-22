@@ -218,7 +218,11 @@ export default function NftForm({ windowSize }) {
                                         placeholder="0x..."
                                         value={contractInput}
                                         onKeyPress={(e) => {
-                                            if (e.key === "Enter") {
+                                            if (
+                                                e.key === "Enter" &&
+                                                contractInput &&
+                                                tokenIdInput
+                                            ) {
                                                 findNFt()
                                             }
                                         }}
@@ -233,7 +237,11 @@ export default function NftForm({ windowSize }) {
                                         placeholder="12345"
                                         value={tokenIdInput}
                                         onKeyPress={(e) => {
-                                            if (e.key === "Enter") {
+                                            if (
+                                                e.key === "Enter" &&
+                                                contractInput &&
+                                                tokenIdInput
+                                            ) {
                                                 findNFt()
                                             }
                                         }}
