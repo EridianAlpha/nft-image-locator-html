@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import AdvancedSettings from "./AdvancedSettingsModal"
 import NftImage from "./NftImage"
-import { chainName, chainIcon } from "../../utils/chainDetails"
+import { chainName, chainIcon, chainList } from "../../utils/chainDetails"
 import Examples from "./Examples"
 import { fetchUriData } from "../../utils/fetchUriData"
 
@@ -25,11 +25,8 @@ import {
     Container,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faGear, faWarning, faWallet } from "@fortawesome/free-solid-svg-icons"
-import { useContractRead, useBlockNumber } from "wagmi"
-
-import { useNetwork, useProvider, useAccount } from "wagmi"
-import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit"
+import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
+import { useContractRead, useContractReads, useBlockNumber } from "wagmi"
 
 export default function NftForm({ windowSize }) {
     // Check if the current render is on the server (Server Side Render) or client
@@ -39,14 +36,10 @@ export default function NftForm({ windowSize }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Use refetch to manually test the connection
-    const { refetch: blockNumberRefetch } = useBlockNumber()
-
-    // Get wallet functions
-    const { chain } = useNetwork()
-    const provider = useProvider()
-    const { isConnected } = useAccount()
-    const { openChainModal } = useChainModal()
-    const { openConnectModal } = useConnectModal()
+    // TODO set chaindId based on state
+    const { refetch: blockNumberRefetch } = useBlockNumber({
+        chainId: 1,
+    })
 
     // Variables
     const formBackground = useColorModeValue("gray.100", "gray.700")
@@ -71,18 +64,23 @@ export default function NftForm({ windowSize }) {
     const [tokenUri, setTokenUri] = useState<any>()
     const [tokenUriJson, setTokenUriJson] = useState<any>()
     const [contractData, setContractData] = useState<any>()
+    // const [contracts, setContracts] = useState<any>([])
 
     // State used for connection testing
     const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
 
     // Read the contract data, using refetch to manually trigger
     // rather than only on change or load
-    const { refetch: contractDataRefetch } = useContractRead({
-        address: contractInput,
-        abi: contractAbi,
-        functionName: contractFunctionName,
-        args: [tokenIdInput],
-    })
+    const contracts = () => {
+        return chainList.map((chain) => ({
+            address: contractInput,
+            abi: contractAbi,
+            functionName: contractFunctionName,
+            args: [tokenIdInput],
+            chainId: chain.id,
+        }))
+    }
+    const { refetch: contractsDataRefetch } = useContractReads({ contracts: contracts() })
 
     // Update url params when inputs change
     useEffect(() => {
@@ -108,12 +106,13 @@ export default function NftForm({ windowSize }) {
         setTokenUriJson("Loading")
 
         if (blockNumberResponse.isSuccess) {
-            const response = await contractDataRefetch()
-            console.log("response", response)
+            const response = await contractsDataRefetch()
 
             if (response.isSuccess) {
                 setContractData(response.data)
                 setTokenUri(response.data)
+                console.log("response.data X", response.data)
+
                 setTokenUriJson(await fetchUriData(response.data))
             } else {
                 setContractData(null)
@@ -163,54 +162,7 @@ export default function NftForm({ windowSize }) {
                             >
                                 <FormControl pt={8}>
                                     <FormLabel>Network:</FormLabel>
-                                    {isConnected &&
-                                    // walletConnected &&
-                                    window.localStorage.getItem("connected") ? (
-                                        <Button
-                                            marginRight={2}
-                                            paddingLeft={2}
-                                            paddingRight={2}
-                                            onClick={async () => {
-                                                openChainModal ? openChainModal() : null
-                                            }}
-                                            aria-label={"Change network"}
-                                        >
-                                            <Image src={chainIcon(chain, provider)}></Image>
-                                            <Text marginLeft={2}>{chainName(chain, provider)}</Text>
-                                        </Button>
-                                    ) : (
-                                        <Flex direction={"row"} wrap={"wrap"}>
-                                            <Button
-                                                isDisabled={true}
-                                                marginRight={2}
-                                                paddingLeft={2}
-                                                paddingRight={2}
-                                                aria-label={"Change network"}
-                                            >
-                                                <Image src={"./EthereumLogo.svg"}></Image>
-                                                <Text marginLeft={2}>{"Ethereum Mainnet"}</Text>
-                                            </Button>
-                                            <Tooltip
-                                                hasArrow
-                                                openDelay={100}
-                                                placement="top"
-                                                label="Connect wallet to change network"
-                                            >
-                                                <IconButton
-                                                    onClick={async () => {
-                                                        openConnectModal ? openConnectModal() : null
-                                                        window!.localStorage.setItem(
-                                                            "connected",
-                                                            "injected"
-                                                        )
-                                                    }}
-                                                    aria-label={"Connect wallet network"}
-                                                >
-                                                    <FontAwesomeIcon icon={faWallet} size={"lg"} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </Flex>
-                                    )}
+                                    <Text>Mainnet, Goerli, Gnosis</Text>
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Contract Address:</FormLabel>

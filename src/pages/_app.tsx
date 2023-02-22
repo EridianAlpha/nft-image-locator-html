@@ -5,8 +5,8 @@ import "../styles/globals.css"
 import { ThemeContext, WalletConnectedContext, CustomRpcProviderContext } from "../utils/context"
 
 import { ChakraProvider } from "@chakra-ui/react"
-import { WagmiConfig, createClient, configureChains, mainnet, goerli } from "wagmi"
-import { gnosis } from "wagmi/chains"
+import { WagmiConfig, createClient, configureChains } from "wagmi"
+import { chainList } from "../utils/chainDetails"
 import { publicProvider } from "wagmi/providers/public"
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
 
@@ -44,19 +44,16 @@ function MyApp({ Component, pageProps }: AppProps) {
     )
 
     // Create Wagmi client
-    const { chains, provider } = configureChains(
-        [mainnet, goerli, gnosis],
-        [
-            customRpcProvider
-                ? jsonRpcProvider({
-                      priority: 0,
-                      rpc: () => ({
-                          http: customRpcProvider,
-                      }),
-                  })
-                : publicProvider(),
-        ]
-    )
+    const { chains, provider } = configureChains(chainList, [
+        customRpcProvider
+            ? jsonRpcProvider({
+                  priority: 0,
+                  rpc: () => ({
+                      http: customRpcProvider,
+                  }),
+              })
+            : publicProvider(),
+    ])
 
     const { connectors } = getDefaultWallets({
         appName: "NFT Image Locator App",

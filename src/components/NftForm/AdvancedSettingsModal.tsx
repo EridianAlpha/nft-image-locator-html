@@ -52,7 +52,6 @@ export default function AdvancedSettingsModal({
     tokenUriJson,
 }: AdvancedSettingsModalProps) {
     const isSSR = typeof window === "undefined"
-    const provider = useProvider<any>()
 
     // This variable uses context because it's used in the top level render of the app
     const { customRpcProvider, setCustomRpcProvider } = useContext(CustomRpcProviderContext)

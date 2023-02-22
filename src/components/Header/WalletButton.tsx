@@ -99,7 +99,8 @@ export default function WalletButton({ windowSize }) {
                 <Box paddingLeft={10}>
                     {isConnected && walletConnected && window.localStorage.getItem("connected") ? (
                         <Flex direction={"row"}>
-                            <Button
+                            {/* Not using this for now
+                                <Button
                                 marginRight={2}
                                 paddingLeft={2}
                                 paddingRight={2}
@@ -112,7 +113,7 @@ export default function WalletButton({ windowSize }) {
                                 {windowSize.width > 700 ? (
                                     <Text marginLeft={2}>{chainName(chain, provider)}</Text>
                                 ) : null}
-                            </Button>
+                            </Button> */}
                             <Menu
                                 onClose={() => {
                                     setTimeout(function () {

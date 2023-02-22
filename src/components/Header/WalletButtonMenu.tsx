@@ -18,7 +18,6 @@ export default function WalletButtonMenu({
     setCopyIcon: any
 }) {
     // Everything comes from Wagmi
-    const provider = useProvider()
     const { address, isConnected, status } = useAccount()
     const { disconnect } = useDisconnect()
     const { chain } = useNetwork()

@@ -1,3 +1,5 @@
+import { mainnet, goerli, gnosis } from "wagmi/chains"
+
 export const chainName = (chain, provider) => {
     if (chain?.id === 1) {
         return "Ethereum Mainnet"
@@ -17,3 +19,5 @@ export const chainIcon = (chain, provider) => {
         return "./GoerliLogo.svg"
     }
 }
+
+export const chainList = [mainnet, goerli, gnosis]
