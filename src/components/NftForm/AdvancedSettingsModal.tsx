@@ -120,7 +120,7 @@ export default function AdvancedSettingsModal({
                                                 colorScheme="yellow"
                                                 mb={0.5}
                                             >
-                                                Public Provider (Automatic)
+                                                Public Providers (Automatic)
                                             </Badge>
                                         </Box>
                                         <Box>

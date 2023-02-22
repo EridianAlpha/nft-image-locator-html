@@ -23,6 +23,8 @@ import {
     useDisclosure,
     Tooltip,
     Container,
+    Badge,
+    Center,
 } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faGear, faWarning } from "@fortawesome/free-solid-svg-icons"
@@ -159,11 +161,57 @@ export default function NftForm({ windowSize }) {
                                 gap="5"
                             >
                                 <FormControl pt={8}>
-                                    <FormLabel>Network:</FormLabel>
-                                    <Text>Mainnet, Goerli, Gnosis</Text>
+                                    <FormLabel>
+                                        <Text as="b" fontSize="lg">
+                                            Network
+                                        </Text>
+                                    </FormLabel>
+                                    <Flex wrap={"nowrap"}>
+                                        <Input
+                                            isDisabled
+                                            value={
+                                                "Searching Mainnet [1], Goerli [5], Gnosis [100]"
+                                            }
+                                        ></Input>
+                                        <Spacer />
+                                        <Tooltip
+                                            hasArrow
+                                            openDelay={300}
+                                            placement="top"
+                                            label="Select RPC Provider"
+                                        >
+                                            <IconButton
+                                                ml={2}
+                                                //Stops the tooltip opening when modal closes
+                                                onFocus={(e) => e.preventDefault()}
+                                                onClick={() => {
+                                                    onOpen()
+                                                    // If there's an RPC error, don't clear the tokenUriJson so the error is visible when the modal opens
+                                                    if (tokenUriJson != "RPC Error") {
+                                                        setBlockNumberRefetchResponse("")
+                                                    }
+                                                }}
+                                                aria-label={"Advanced settings"}
+                                            >
+                                                {tokenUriJson == "RPC Error" ? (
+                                                    <FontAwesomeIcon
+                                                        color="red"
+                                                        icon={faWarning}
+                                                        size={"lg"}
+                                                    />
+                                                ) : (
+                                                    <FontAwesomeIcon icon={faGear} size={"lg"} />
+                                                )}
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Flex>
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Contract Address:</FormLabel>
+                                    <FormLabel>
+                                        <Text as="b" fontSize="lg">
+                                            Contract Address
+                                        </Text>
+                                    </FormLabel>
                                     <Input
                                         placeholder="0x..."
                                         value={contractInput}
@@ -182,7 +230,11 @@ export default function NftForm({ windowSize }) {
                                     ></Input>
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Token ID:</FormLabel>
+                                    <FormLabel>
+                                        <Text as="b" fontSize="lg">
+                                            Token ID
+                                        </Text>
+                                    </FormLabel>
                                     <Input
                                         placeholder="12345"
                                         value={tokenIdInput}
@@ -201,9 +253,9 @@ export default function NftForm({ windowSize }) {
                                     ></Input>
                                 </FormControl>
 
-                                <Flex minWidth="100%">
-                                    <Box width={"40px"} />
-                                    <Spacer />
+                                <Center>
+                                    {/* <Box width={"40px"} />
+                                    <Spacer /> */}
                                     <Button
                                         isDisabled={
                                             tokenUriJson == "Loading" ||
@@ -219,37 +271,7 @@ export default function NftForm({ windowSize }) {
                                     >
                                         {tokenUriJson == "Loading" ? <Spinner /> : "Find NFT"}
                                     </Button>
-                                    <Spacer />
-                                    <Tooltip
-                                        hasArrow
-                                        openDelay={300}
-                                        placement="top"
-                                        label="Select RPC Provider"
-                                    >
-                                        <IconButton
-                                            //Stops the tooltip opening when modal closes
-                                            onFocus={(e) => e.preventDefault()}
-                                            onClick={() => {
-                                                onOpen()
-                                                // If there's an RPC error, don't clear the tokenUriJson so the error is visible when the modal opens
-                                                if (tokenUriJson != "RPC Error") {
-                                                    setBlockNumberRefetchResponse("")
-                                                }
-                                            }}
-                                            aria-label={"Advanced settings"}
-                                        >
-                                            {tokenUriJson == "RPC Error" ? (
-                                                <FontAwesomeIcon
-                                                    color="red"
-                                                    icon={faWarning}
-                                                    size={"lg"}
-                                                />
-                                            ) : (
-                                                <FontAwesomeIcon icon={faGear} size={"lg"} />
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
-                                </Flex>
+                                </Center>
                             </Flex>
                         </Flex>
                     </Container>

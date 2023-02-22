@@ -1,4 +1,18 @@
-import { mainnet, goerli, gnosis } from "wagmi/chains"
+import {
+    mainnet,
+    goerli,
+    arbitrum,
+    aurora,
+    auroraTestnet,
+    avalanche,
+    bsc,
+    optimism,
+    polygon,
+    sepolia,
+    zkSync,
+    zkSyncTestnet,
+    gnosis,
+} from "wagmi/chains"
 
 export const chainName = (chain, provider) => {
     if (chain?.id === 1) {
@@ -20,4 +34,18 @@ export const chainIcon = (chain, provider) => {
     }
 }
 
-export const chainList = [mainnet, goerli, gnosis]
+export const chainList = [
+    mainnet,
+    goerli,
+    arbitrum,
+    aurora,
+    auroraTestnet,
+    avalanche,
+    bsc,
+    // optimism,
+    polygon,
+    sepolia,
+    zkSync,
+    zkSyncTestnet,
+    gnosis,
+]
