@@ -111,8 +111,6 @@ export default function NftForm({ windowSize }) {
             if (response.isSuccess) {
                 setContractData(response.data)
                 setTokenUri(response.data)
-                console.log("response.data X", response.data)
-
                 setTokenUriJson(await fetchUriData(response.data))
             } else {
                 setContractData(null)

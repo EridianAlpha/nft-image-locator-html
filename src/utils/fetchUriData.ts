@@ -2,18 +2,11 @@ import { checkUriDataType } from "./checkUriDataType"
 
 export async function fetchUriData(_tokenUri: any) {
     console.log("Fetching tokenUri:", _tokenUri)
-    console.log("_tokenUri.length", _tokenUri.length)
-
     let result: any
 
-    // _tokenUri.forEach(async (uri: any) => {
     for (let i = 0; i < _tokenUri.length; i++) {
-        console.log("HERE1")
-
         if (_tokenUri[i] && _tokenUri[i].startsWith("http")) {
             // If tokenUri is a standard HTTP URI, fetch it
-            console.log("_tokenUri 1234", _tokenUri[i])
-
             result = await fetch(_tokenUri[i])
                 .then(async (response) => {
                     if (!response.ok) {
@@ -68,6 +61,5 @@ export async function fetchUriData(_tokenUri: any) {
             result = "NFT protocol not supported yet: " + _tokenUri[i]
         }
     }
-
     return result
 }
