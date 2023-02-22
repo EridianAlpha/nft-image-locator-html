@@ -135,7 +135,12 @@ export default function NftForm({ windowSize }) {
     return (
         <>
             <Flex alignItems="center" direction="column">
-                <Flex pt={10} pr={0} alignItems="center" justifyContent="center">
+                <Flex
+                    pt={windowSize.width > 540 ? 10 : 0}
+                    pr={0}
+                    alignItems="center"
+                    justifyContent="center"
+                >
                     <Container padding={0} minW="300px" maxW={"700px"}>
                         <Flex
                             direction="column"
