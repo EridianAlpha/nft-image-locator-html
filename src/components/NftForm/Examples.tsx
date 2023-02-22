@@ -70,7 +70,7 @@ export default function Examples({
             contractInput: "0xd9b78a2f1dafc8bb9c60961790d2beefebee56f4",
             tokenIdInput: "7013",
             example: "2",
-            src: "https://i.seadn.io/gae/HtMUqt4dLbLfGBDWscXwuoIGkkZYCB1bA4QgYw1UUERBkEu5g7Dgy8RFpc6XIpyPEb4OK6entlPFlRKbxABeUtYONxXEnmXFaSg7?auto=format&w=1000",
+            src: "https://ipfs.io/ipfs/QmVCLxmzMstWpnCE2caF3AfRNEJmdiA6Z6a8BECnXqd98r/7013.png",
         },
         {
             contractInput: "0x48db94c563115cb0e17c360d609aa5cb72bbc624",
