@@ -116,9 +116,6 @@ export default function NftForm({ windowSize }) {
                 setContractData(response.data)
                 setTokenUri(response.data)
                 setTokenUriJson(await fetchUriData(response.data))
-            } else {
-                setContractData(null)
-                setTokenUriJson("NFT Not Found")
             }
         } else {
             setTokenUriJson("RPC Error")
@@ -298,7 +295,12 @@ export default function NftForm({ windowSize }) {
                         maxWidth={windowSize.width > 540 ? "90%" : "100%"}
                         overflow={"scroll"}
                     >
-                        <Code rounded={windowSize.width > 540 ? 15 : 0} p={5}>
+                        <Code
+                            rounded={
+                                windowSize.width < 540 && tokenUriJson != "NFT not found" ? 0 : 15
+                            }
+                            p={5}
+                        >
                             <pre>{JSON.stringify(tokenUriJson, null, 2)}</pre>
                         </Code>
                     </Box>

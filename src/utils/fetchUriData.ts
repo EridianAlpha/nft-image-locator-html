@@ -61,5 +61,9 @@ export async function fetchUriData(_tokenUri: any) {
             result = "NFT protocol not supported yet: " + _tokenUri[i]
         }
     }
-    return result
+    if (result) {
+        return result
+    } else {
+        return "NFT not found"
+    }
 }
