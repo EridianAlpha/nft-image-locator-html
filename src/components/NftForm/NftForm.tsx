@@ -66,7 +66,9 @@ export default function NftForm({ windowSize }) {
     const [tokenUri, setTokenUri] = useState<any>()
     const [tokenUriJson, setTokenUriJson] = useState<any>()
     const [contractData, setContractData] = useState<any>()
-    // const [contracts, setContracts] = useState<any>([])
+
+    // TODO Workaround for padding condition not working on page load
+    const [topPadding, setTopPadding] = useState<any>([])
 
     // State used for connection testing
     const [blockNumberRefetchResponse, setBlockNumberRefetchResponse] = useState<any>()
@@ -132,11 +134,18 @@ export default function NftForm({ windowSize }) {
         return response
     }
 
+    useEffect(() => {
+        windowSize.width < 540 ? setTopPadding(0) : setTopPadding(10)
+    }, [windowSize.width])
+
     return (
         <>
             <Flex alignItems="center" direction="column">
                 <Flex
-                    pt={windowSize.width > 540 ? 10 : 0}
+                    // TODO This condition didn't work on page load
+                    // Use a state variable to set the padding as a workaround
+                    // pt={windowSize.width < 540 ? 0 : 10}
+                    pt={topPadding}
                     pr={0}
                     alignItems="center"
                     justifyContent="center"
@@ -150,7 +159,7 @@ export default function NftForm({ windowSize }) {
                             rounded={windowSize.width > 540 ? 15 : 0}
                         >
                             <Heading textAlign={"center"} mb={6}>
-                                Where&apos;s My NFT?
+                                Where&apos;s my NFT?
                             </Heading>
                             <Examples
                                 contractInput={contractInput}
